@@ -8,6 +8,7 @@ import (
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/data/binding"
+	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
 	"github.com/bep/debounce"
 	"github.com/charmbracelet/log"
@@ -23,8 +24,8 @@ func main() {
 	a := app.New()
 	//a.Settings().SetTheme(&myTheme{})
 
-	w := a.NewWindow("Hello")
-	w.Resize(fyne.NewSize(900, 600))
+	w := a.NewWindow("AnimeGui")
+	w.Resize(fyne.NewSize(1000, 700))
 
 	debounced := debounce.New(400 * time.Millisecond)
 
@@ -41,7 +42,7 @@ func main() {
 		})
 
 	hello := widget.NewLabel("Hello Fyne!")
-	button := widget.NewButton("Hi!", func() {
+	button := widget.NewButton("Play!", func() {
 		//fmt.Println(anilist.Search())
 		err := data.Set([]string{"feur"})
 		if err != nil {
@@ -69,7 +70,6 @@ func main() {
 	radiobox.Horizontal = true
 
 	vbox := container.NewVBox(
-		button,
 		input,
 		radiobox,
 	)
@@ -90,11 +90,17 @@ func main() {
 
 	animeName := widget.NewLabelWithStyle("", fyne.TextAlignCenter, fyne.TextStyle{})
 
-	episodeNumber := widget.NewLabelWithStyle("", fyne.TextAlignCenter, fyne.TextStyle{})
-	imageContainer := container.NewVBox(imageEx, animeName, episodeNumber)
+	episodeNumber := widget.NewLabelWithStyle("", fyne.TextAlignCenter, fyne.TextStyle{Bold: true})
+	episodeMinus := widget.NewButton("-", func() {})
+	episodePlus := widget.NewButton("+", func() {})
+
+	episodeContainer := container.NewHBox(layout.NewSpacer(), episodeMinus, episodeNumber, episodePlus, layout.NewSpacer())
+
+	playContainer := container.NewHBox(layout.NewSpacer(), button, layout.NewSpacer())
+
+	imageContainer := container.NewVBox(imageEx, animeName, episodeContainer, layout.NewSpacer(), playContainer)
 
 	listDisplay.OnSelected = func(id int) {
-		//log.Infof("Selected: %d", id)
 		listName, err := data.GetValue(id)
 		if err == nil {
 			animeName.SetText(listName)
