@@ -35,7 +35,7 @@ func main() {
 
 	listDisplay := widget.NewListWithData(data,
 		func() fyne.CanvasObject {
-			return widget.NewLabel("template")
+			return &widget.Label{Text: "template"}
 		},
 		func(i binding.DataItem, o fyne.CanvasObject) {
 			o.(*widget.Label).Bind(i.(binding.String))
@@ -49,6 +49,8 @@ func main() {
 			return
 		}
 	})
+
+	button.Importance = widget.HighImportance
 
 	input := widget.NewEntry()
 	input.SetPlaceHolder("Anime name")
@@ -91,8 +93,8 @@ func main() {
 	animeName := widget.NewLabelWithStyle("", fyne.TextAlignCenter, fyne.TextStyle{})
 
 	episodeNumber := widget.NewLabelWithStyle("", fyne.TextAlignCenter, fyne.TextStyle{Bold: true})
-	episodeMinus := widget.NewButton("-", func() {})
-	episodePlus := widget.NewButton("+", func() {})
+	episodeMinus := widget.NewButton(" - ", func() {})
+	episodePlus := widget.NewButton(" + ", func() {})
 
 	episodeContainer := container.NewHBox(layout.NewSpacer(), episodeMinus, episodeNumber, episodePlus, layout.NewSpacer())
 
