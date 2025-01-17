@@ -8,13 +8,12 @@ import (
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/data/binding"
-	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
 	"github.com/bep/debounce"
 	"github.com/charmbracelet/log"
 	"github.com/rl404/verniy"
 	"image"
-	"os"
+	"net/http"
 	"time"
 )
 
@@ -22,7 +21,8 @@ var animeList []verniy.MediaList
 
 func main() {
 	a := app.New()
-	a.Settings().SetTheme(&myTheme{})
+	//a.Settings().SetTheme(&myTheme{})
+
 	w := a.NewWindow("Hello")
 	w.Resize(fyne.NewSize(900, 600))
 
@@ -39,11 +39,6 @@ func main() {
 		func(i binding.DataItem, o fyne.CanvasObject) {
 			o.(*widget.Label).Bind(i.(binding.String))
 		})
-
-	listDisplay.OnSelected = func(id int) {
-		//log.Infof("Selected: %d", id)
-		fmt.Println(*animeList[id].Media.CoverImage.ExtraLarge)
-	}
 
 	hello := widget.NewLabel("Hello Fyne!")
 	button := widget.NewButton("Hi!", func() {
@@ -64,7 +59,11 @@ func main() {
 
 	radiobox := widget.NewRadioGroup([]string{"Watching", "Planning", "Completed", "Dropped"}, func(s string) {
 		animeList = anilist.FindList(s)
-		updateName(data)
+		if updateAnimeNames(data) {
+			listDisplay.Unselect(0)
+			listDisplay.Select(0)
+			listDisplay.ScrollToTop()
+		}
 	})
 	radiobox.Required = true
 	radiobox.Horizontal = true
@@ -80,31 +79,51 @@ func main() {
 	go anilist.GetData(radiobox)
 
 	// Load image from file
-	imgFile, err := os.Open("asset/img.png")
+	/*imgFile, err := os.Open("asset/img.png")
 	anilist.Fatal(err)
 	defer imgFile.Close()
 
 	img, _, err := image.Decode(imgFile)
-	anilist.Fatal(err)
+	anilist.Fatal(err)*/
 
-	size := img.Bounds().Size()
-	ratio := float32(size.X) / float32(size.Y)
-	newWidth := 400
-	newHeight := float32(newWidth) / ratio
+	imageEx := &canvas.Image{}
 
-	imageEx := canvas.NewImageFromImage(img)
-	imageEx.FillMode = canvas.ImageFillContain
+	animeName := widget.NewLabelWithStyle("", fyne.TextAlignCenter, fyne.TextStyle{})
 
-	imageEx.SetMinSize(fyne.NewSize(400, newHeight))
+	episodeNumber := widget.NewLabelWithStyle("", fyne.TextAlignCenter, fyne.TextStyle{})
+	imageContainer := container.NewVBox(imageEx, animeName, episodeNumber)
 
-	imageContainer := container.NewVBox(imageEx, layout.NewSpacer())
+	listDisplay.OnSelected = func(id int) {
+		//log.Infof("Selected: %d", id)
+		listName, err := data.GetValue(id)
+		if err == nil {
+			animeName.SetText(listName)
+		}
+
+		if animeList[id].Progress != nil && animeList[id].Media.Episodes != nil {
+			episodeNumber.SetText(fmt.Sprintf("Episode %d/%d", *animeList[id].Progress, *animeList[id].Media.Episodes))
+		} else {
+			episodeNumber.SetText("No episode data")
+		}
+
+		imageLink := *animeList[id].Media.CoverImage.ExtraLarge
+
+		imageFile := GetImageFromUrl(imageLink)
+		if imageFile == nil {
+			log.Error("No image found")
+			return
+		}
+
+		*imageEx = *getAnimeImageFromImage(imageFile)
+		imageContainer.Refresh()
+	}
 
 	w.SetContent(container.NewBorder(nil, nil, nil, imageContainer, leftSide))
 
 	w.ShowAndRun()
 }
 
-func updateName(data binding.ExternalStringList) {
+func updateAnimeNames(data binding.ExternalStringList) (first bool) {
 	if animeList == nil {
 		log.Error("No list found")
 		return
@@ -123,8 +142,42 @@ func updateName(data binding.ExternalStringList) {
 			}
 		}
 	}
+	if len(tempName) != 0 {
+		first = true
+	}
 	err := data.Set(tempName)
 	if err != nil {
 		return
 	}
+	return first
+}
+
+func GetImageFromUrl(url string) image.Image {
+	resp, err := http.Get(url)
+	if err != nil {
+		fmt.Println("Error downloading image:", err)
+		return nil
+	}
+	defer resp.Body.Close()
+
+	img, _, err := image.Decode(resp.Body)
+	if err != nil {
+		fmt.Println("Error decoding image:", err)
+		return nil
+	}
+	return img
+}
+
+func getAnimeImageFromImage(img image.Image) *canvas.Image {
+	size := img.Bounds().Size()
+	ratio := float32(size.X) / float32(size.Y)
+	var newWidth float32 = 300
+	newHeight := newWidth / ratio
+
+	imageEx := canvas.NewImageFromImage(img)
+	imageEx.FillMode = canvas.ImageFillContain
+
+	imageEx.SetMinSize(fyne.NewSize(newWidth, newHeight))
+
+	return imageEx
 }
