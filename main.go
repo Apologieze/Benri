@@ -8,7 +8,9 @@ import (
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/data/binding"
+	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/layout"
+	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 	"github.com/bep/debounce"
 	"github.com/charmbracelet/log"
@@ -21,8 +23,11 @@ import (
 var animeList []verniy.MediaList
 
 func main() {
+	startCurdInteg()
+	fmt.Println(localAnime)
 	a := app.New()
 	//a.Settings().SetTheme(&myTheme{})
+	var animeId int = -1
 
 	w := a.NewWindow("AnimeGui")
 	w.Resize(fyne.NewSize(1000, 700))
@@ -41,15 +46,17 @@ func main() {
 			o.(*widget.Label).Bind(i.(binding.String))
 		})
 
+	dialogC := dialog.NewCustom("Select the correct anime", "Cancel", container.NewCenter(widget.NewLabel("Salut")), w)
+
 	hello := widget.NewLabel("Hello Fyne!")
-	button := widget.NewButton("Play!", func() {
+	button := widget.NewButtonWithIcon("Play!", theme.MediaPlayIcon(), func() {
 		//fmt.Println(anilist.Search())
-		err := data.Set([]string{"feur"})
-		if err != nil {
-			return
-		}
+		fmt.Println(animeId)
+		OnPlayButtonClick(animeId)
+		dialogC.Show()
 	})
 
+	button.IconPlacement = widget.ButtonIconTrailingText
 	button.Importance = widget.HighImportance
 
 	input := widget.NewEntry()
@@ -107,6 +114,8 @@ func main() {
 		if err == nil {
 			animeName.SetText(listName)
 		}
+
+		animeId = animeList[id].Media.ID
 
 		if animeList[id].Progress != nil && animeList[id].Media.Episodes != nil {
 			episodeNumber.SetText(fmt.Sprintf("Episode %d/%d", *animeList[id].Progress, *animeList[id].Media.Episodes))

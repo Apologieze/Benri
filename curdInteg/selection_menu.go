@@ -1,4 +1,4 @@
-package internal
+package curdInteg
 
 import (
 	"bytes"
@@ -15,7 +15,7 @@ import (
 	"time"
 )
 
-// SelectionOption holds the label and the internal key
+// SelectionOption holds the label and the curdInteg key
 type SelectionOption struct {
 	Label string
 	Key   string

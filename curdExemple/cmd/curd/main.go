@@ -165,7 +165,7 @@ func main() {
 
 	if *addNewAnime {
 		internal.AddNewAnime(&userCurdConfig, &anime, &user, &databaseAnimes, logFile)
-		// internal.ExitCurd(fmt.Errorf("Added new anime!"))
+		// curdInteg.ExitCurd(fmt.Errorf("Added new anime!"))
 	}
 
 	internal.SetupCurd(&userCurdConfig, &anime, &user, &databaseAnimes, logFile)
@@ -308,7 +308,7 @@ func main() {
 						}
 						err = internal.DiscordPresence(discordClientId, anime, isPaused.(bool))
 						if err != nil {
-							// internal.Log("Error setting Discord presence: "+err.Error(), logFile)
+							// curdInteg.Log("Error setting Discord presence: "+err.Error(), logFile)
 						}
 						time.Sleep(1 * time.Second)
 					}
@@ -361,7 +361,7 @@ func main() {
 					time.Sleep(1 * time.Second)
 
 					// Get current playback time
-					// internal.Log("Getting playback time "+anime.Ep.Player.SocketPath, logFile)
+					// curdInteg.Log("Getting playback time "+anime.Ep.Player.SocketPath, logFile)
 					timePos, err := internal.MPVSendCommand(anime.Ep.Player.SocketPath, []interface{}{"get_property", "time-pos"})
 					if err != nil {
 						internal.Log("Error getting playback time: "+err.Error(), logFile)
@@ -424,7 +424,7 @@ func main() {
 						if err != nil {
 							internal.Log("Error updating local database: "+err.Error(), logFile)
 						} else {
-							// internal.Log(fmt.Sprintf("Updated database: AnilistId=%d, AllanimeId=%s, EpNumber=%d, PlaybackTime=%d",
+							// curdInteg.Log(fmt.Sprintf("Updated database: AnilistId=%d, AllanimeId=%s, EpNumber=%d, PlaybackTime=%d",
 							// anime.AnilistId, anime.AllanimeId, anime.Ep.Number, anime.Ep.Player.PlaybackTime), logFile)
 						}
 					}
@@ -478,7 +478,7 @@ func main() {
 			}()
 
 			anime.Ep.IsCompleted = false
-			// internal.CurdOut(anime.Ep.Number, anime.TotalEpisodes, &userCurdConfig)
+			// curdInteg.CurdOut(anime.Ep.Number, anime.TotalEpisodes, &userCurdConfig)
 			if anime.Ep.Number-1 == anime.TotalEpisodes && userCurdConfig.ScoreOnCompletion {
 				anime.Ep.Number = anime.Ep.Number - 1
 				internal.CurdOut("Completed anime.")
