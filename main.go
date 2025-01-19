@@ -16,6 +16,8 @@ import (
 	"github.com/charmbracelet/log"
 	"github.com/rl404/verniy"
 	"image"
+	"image/color"
+	"io"
 	"net/http"
 	"time"
 )
@@ -83,7 +85,10 @@ func main() {
 		radiobox,
 	)
 
-	leftSide := container.NewBorder(vbox, nil, nil, nil, listDisplay)
+	var grayScaleList uint8 = 40
+	listContainer := container.NewStack(canvas.NewRectangle(color.RGBA{R: grayScaleList, G: grayScaleList, B: grayScaleList, A: 255}), listDisplay)
+
+	leftSide := container.NewBorder(vbox, nil, nil, nil, listContainer)
 
 	go anilist.GetData(radiobox)
 
@@ -175,7 +180,9 @@ func GetImageFromUrl(url string) image.Image {
 		fmt.Println("Error downloading image:", err)
 		return nil
 	}
-	defer resp.Body.Close()
+	defer func(Body io.ReadCloser) {
+		_ = Body.Close()
+	}(resp.Body)
 
 	img, _, err := image.Decode(resp.Body)
 	if err != nil {
