@@ -29,7 +29,7 @@ func main() {
 	fmt.Println(localAnime)
 	a := app.New()
 	//a.Settings().SetTheme(&myTheme{})
-	var animeId int = -1
+	var animeSelected verniy.MediaList
 
 	w := a.NewWindow("AnimeGui")
 	w.Resize(fyne.NewSize(1000, 700))
@@ -51,15 +51,6 @@ func main() {
 	dialogC := dialog.NewCustom("Select the correct anime", "Cancel", container.NewCenter(widget.NewLabel("Salut")), w)
 
 	hello := widget.NewLabel("Hello Fyne!")
-	button := widget.NewButtonWithIcon("Play!", theme.MediaPlayIcon(), func() {
-		//fmt.Println(anilist.Search())
-		fmt.Println(animeId)
-		OnPlayButtonClick(animeId)
-		dialogC.Show()
-	})
-
-	button.IconPlacement = widget.ButtonIconTrailingText
-	button.Importance = widget.HighImportance
 
 	input := widget.NewEntry()
 	input.SetPlaceHolder("Anime name")
@@ -85,12 +76,12 @@ func main() {
 		radiobox,
 	)
 
-	var grayScaleList uint8 = 40
+	var grayScaleList uint8 = 35
 	listContainer := container.NewStack(canvas.NewRectangle(color.RGBA{R: grayScaleList, G: grayScaleList, B: grayScaleList, A: 255}), listDisplay)
 
 	leftSide := container.NewBorder(vbox, nil, nil, nil, listContainer)
 
-	go anilist.GetData(radiobox)
+	go anilist.GetData(radiobox, user.Username)
 
 	// Load image from file
 	/*imgFile, err := os.Open("asset/img.png")
@@ -110,25 +101,37 @@ func main() {
 
 	episodeContainer := container.NewHBox(layout.NewSpacer(), episodeMinus, episodeNumber, episodePlus, layout.NewSpacer())
 
+	button := widget.NewButtonWithIcon("Play!", theme.MediaPlayIcon(), func() {
+		//fmt.Println(anilist.Search())
+		fmt.Println(animeSelected.Media.ID)
+		if animeName.Text == "" {
+			return
+		}
+		OnPlayButtonClick(animeName.Text, animeSelected)
+		dialogC.Show()
+	})
+
+	button.IconPlacement = widget.ButtonIconTrailingText
+	button.Importance = widget.HighImportance
+
 	playContainer := container.NewHBox(layout.NewSpacer(), button, layout.NewSpacer())
 
 	imageContainer := container.NewVBox(imageEx, animeName, episodeContainer, layout.NewSpacer(), playContainer)
 
 	listDisplay.OnSelected = func(id int) {
 		listName, err := data.GetValue(id)
+		animeSelected = animeList[id]
 		if err == nil {
 			animeName.SetText(listName)
 		}
 
-		animeId = animeList[id].Media.ID
-
-		if animeList[id].Progress != nil && animeList[id].Media.Episodes != nil {
-			episodeNumber.SetText(fmt.Sprintf("Episode %d/%d", *animeList[id].Progress, *animeList[id].Media.Episodes))
+		if animeSelected.Progress != nil && animeSelected.Media.Episodes != nil {
+			episodeNumber.SetText(fmt.Sprintf("Episode %d/%d", *animeSelected.Progress, *animeSelected.Media.Episodes))
 		} else {
 			episodeNumber.SetText("No episode data")
 		}
 
-		imageLink := *animeList[id].Media.CoverImage.ExtraLarge
+		imageLink := *animeSelected.Media.CoverImage.ExtraLarge
 
 		imageFile := GetImageFromUrl(imageLink)
 		if imageFile == nil {
@@ -152,16 +155,10 @@ func updateAnimeNames(data binding.ExternalStringList) (first bool) {
 	}
 	tempName := make([]string, 0, 25)
 	for _, anime := range animeList {
-		if media := anime.Media; media != nil {
-			if title := media.Title; title != nil {
-				if english := title.English; english != nil {
-					//fmt.Println(*english)
-					tempName = append(tempName, *english)
-				} else {
-					//log.Error(*title.Romaji)
-					tempName = append(tempName, *title.Romaji)
-				}
-			}
+		if name := anilist.AnimeToName(anime); name != nil {
+			tempName = append(tempName, *name)
+		} else {
+			tempName = append(tempName, "Error name")
 		}
 	}
 	if len(tempName) != 0 {

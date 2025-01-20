@@ -4,18 +4,21 @@ import (
 	curd "animeFyne/curdInteg"
 	"fmt"
 	"github.com/charmbracelet/log"
+	"github.com/rl404/verniy"
 	"os"
 	"path/filepath"
 	"runtime"
 )
 
 var localAnime []curd.Anime
+var userCurdConfig curd.CurdConfig
+var databaseFile string
+var user curd.User
 
 func startCurdInteg() {
 	//discordClientId := "1287457464148820089"
 
 	//var anime curd.Anime
-	var user curd.User
 
 	var homeDir string
 	if runtime.GOOS == "windows" {
@@ -27,7 +30,8 @@ func startCurdInteg() {
 	configFilePath := filepath.Join(homeDir, ".config", "curd", "curd.conf")
 
 	// load curd userCurdConfig
-	userCurdConfig, err := curd.LoadConfig(configFilePath)
+	var err error
+	userCurdConfig, err = curd.LoadConfig(configFilePath)
 	if err != nil {
 		fmt.Println("Error loading config:", err)
 		return
@@ -35,12 +39,12 @@ func startCurdInteg() {
 	curd.SetGlobalConfig(&userCurdConfig)
 
 	logFile := filepath.Join(os.ExpandEnv(userCurdConfig.StoragePath), "debug.log")
-	curd.ClearLogFile(logFile)
+	//curd.ClearLogFile(logFile)
 
 	// Get the token from the token file
 	user.Token, err = curd.GetTokenFromFile(filepath.Join(os.ExpandEnv(userCurdConfig.StoragePath), "token"))
 	if err != nil {
-		curd.Log("Error reading token", logFile)
+		log.Error("Error reading token", logFile)
 	}
 	if user.Token == "" {
 		curd.ChangeToken(&userCurdConfig, &user)
@@ -53,7 +57,7 @@ func startCurdInteg() {
 		}
 	}
 
-	databaseFile := filepath.Join(os.ExpandEnv(userCurdConfig.StoragePath), "curd_history.txt")
+	databaseFile = filepath.Join(os.ExpandEnv(userCurdConfig.StoragePath), "curd_history.txt")
 	localAnime = curd.LocalGetAllAnime(databaseFile)
 	for _, anime := range localAnime {
 		fmt.Println(anime)
@@ -68,7 +72,7 @@ func startCurdInteg() {
 	fmt.Println(curd.PrioritizeLink(url))*/
 }
 
-func SearchFromAniId(id int) *curd.Anime {
+func SearchFromLocalAniId(id int) *curd.Anime {
 	for _, anime := range localAnime {
 		if anime.AnilistId == id {
 			return &anime
@@ -77,33 +81,82 @@ func SearchFromAniId(id int) *curd.Anime {
 	return nil
 }
 
-type KeyValue struct {
-	Name  string
-	Value string
+type AllAnimeIdData struct {
+	Id   string
+	Name string
 }
 
-var keyValueArray []KeyValue
+var keyValueArray []AllAnimeIdData
 
-func OnPlayButtonClick(id int) {
-	if id == -1 {
-		return
+func OnPlayButtonClick(animeName string, animeData verniy.MediaList) {
+	var allAnimeId string
+	animeProgress := 0
+	if animeData.Progress != nil {
+		animeProgress = *animeData.Progress
 	}
-	animePointer := SearchFromAniId(id)
+	animePointer := SearchFromLocalAniId(animeData.Media.ID)
 	if animePointer == nil {
-		return
+		allAnimeId = searchAllAnimeData(animeName, animeData.Media.Episodes)
+		if allAnimeId == "" {
+			log.Error("Failed to get allAnimeId")
+			return
+		}
+		err := curd.LocalUpdateAnime(databaseFile, animeData.Media.ID, allAnimeId, animeProgress, 0, 0, animeName)
+		if err != nil {
+			log.Error("Can't update database file", err)
+			return
+		} else {
+			log.Info("Successfully updated database file")
+		}
+	} else {
+		fmt.Println(*animePointer)
+		allAnimeId = animePointer.AllanimeId
 	}
-	fmt.Println(*animePointer)
-	searchAnimeResult, err := curd.SearchAnime("The Eminence in Shadow", "sub")
+	log.Info("AllAnimeId!!!!!:", allAnimeId)
+
+	if animeProgress == 0 {
+		animeProgress = 1
+	}
+	log.Info("Anime Progress:", animeProgress)
+
+	url, err := curd.GetEpisodeURL(userCurdConfig, allAnimeId, animeProgress)
+	if err != nil {
+		log.Error(err)
+	}
+	finalLink := curd.PrioritizeLink(url)
+	fmt.Println(finalLink)
+
+	mpvSocketPath, err := curd.StartVideo(finalLink, []string{}, fmt.Sprintf("%s - Episode %d", animeName, animeProgress))
+	fmt.Println("MPV Socket Path:", mpvSocketPath)
+}
+
+func searchAllAnimeData(animeName string, epNumber *int) string {
+	searchAnimeResult, err := curd.SearchAnime(animeName, "sub")
 	if err != nil {
 		log.Error(err)
 	}
 
-	for key, value := range searchAnimeResult {
-		keyValueArray = append(keyValueArray, KeyValue{Name: key, Value: value})
+	var AllanimeId string
+
+	if epNumber != nil {
+		AllanimeId, err = curd.FindKeyByValue(searchAnimeResult, fmt.Sprintf("%v (%d episodes)", animeName, *epNumber))
+		if err != nil {
+			log.Error("Failed to find anime in animeList:", err)
+		}
+
 	}
 
-	fmt.Println(keyValueArray)
+	// If unable to get Allanime id automatically get manually
+	if AllanimeId == "" {
+		log.Error("Failed to link anime automatically")
+		for key, value := range searchAnimeResult {
+			keyValueArray = append(keyValueArray, AllAnimeIdData{Id: key, Name: value})
+		}
 
+		fmt.Println(keyValueArray)
+	}
+	fmt.Println(AllanimeId)
+	return AllanimeId
 }
 
 /*func main() {

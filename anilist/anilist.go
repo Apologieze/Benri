@@ -1,7 +1,6 @@
 package anilist
 
 import (
-	"fmt"
 	"fyne.io/fyne/v2/widget"
 	"github.com/charmbracelet/log"
 	"github.com/rl404/verniy"
@@ -39,10 +38,10 @@ var categoriesToInt = map[string]int{
 	"Planning":  3,
 }
 
-func GetData(radio *widget.RadioGroup) {
+func GetData(radio *widget.RadioGroup, username string) {
 	v := verniy.New()
 
-	typeAnime, err := v.GetUserAnimeList("Apologize", fields...)
+	typeAnime, err := v.GetUserAnimeList(username, fields...)
 	Fatal(err)
 	UserData = typeAnime
 	if radio != nil {
@@ -61,18 +60,17 @@ func FindList(categoryName string) []verniy.MediaList {
 	return UserData[categoryIndex].Entries
 }
 
-func Search() string {
-	v := verniy.New()
-
-	typeAnime, err := v.GetUserAnimeList("Apologize", fields...)
-	Fatal(err)
-	for _, anime := range typeAnime {
-		fmt.Println(*anime.Name)
-		/*for _, entry := range anime.Entries {
-			fmt.Println(*entry.Media.Title.English)
-		}*/
+func AnimeToName(anime verniy.MediaList) *string {
+	if anime.Media == nil {
+		return nil
 	}
-	return ""
+	if anime.Media.Title == nil {
+		return nil
+	}
+	if anime.Media.Title.English != nil {
+		return anime.Media.Title.English
+	}
+	return anime.Media.Title.Romaji
 }
 
 func Fatal(err error) {
