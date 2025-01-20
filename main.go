@@ -202,3 +202,7 @@ func getAnimeImageFromImage(img image.Image) *canvas.Image {
 
 	return imageEx
 }
+
+func selectCorrectLinking(allAnimeList []AllAnimeIdData) {
+	log.Info("Select the correct anime", allAnimeList)
+}

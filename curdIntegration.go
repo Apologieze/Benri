@@ -86,8 +86,6 @@ type AllAnimeIdData struct {
 	Name string
 }
 
-var keyValueArray []AllAnimeIdData
-
 func OnPlayButtonClick(animeName string, animeData verniy.MediaList) {
 	var allAnimeId string
 	animeProgress := 0
@@ -148,12 +146,14 @@ func searchAllAnimeData(animeName string, epNumber *int) string {
 
 	// If unable to get Allanime id automatically get manually
 	if AllanimeId == "" {
+		var keyValueArray []AllAnimeIdData
 		log.Error("Failed to link anime automatically")
 		for key, value := range searchAnimeResult {
 			keyValueArray = append(keyValueArray, AllAnimeIdData{Id: key, Name: value})
 		}
 
-		fmt.Println(keyValueArray)
+		selectCorrectLinking(keyValueArray)
+		return ""
 	}
 	fmt.Println(AllanimeId)
 	return AllanimeId
