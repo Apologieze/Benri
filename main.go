@@ -29,12 +29,13 @@ var animeSelected *verniy.MediaList
 var episodeNumber = widget.NewLabelWithStyle("", fyne.TextAlignCenter, fyne.TextStyle{Bold: true})
 
 func main() {
+	dowloadMPV()
 	startCurdInteg()
 	fmt.Println(localAnime)
 	a := app.New()
-	//a.Settings().SetTheme(&myTheme{})
+	a.Settings().SetTheme(&forcedVariant{Theme: theme.DefaultTheme(), variant: theme.VariantDark})
 
-	window = a.NewWindow("AnimeGui")
+	window = a.NewWindow("AnimeGUI")
 	window.Resize(fyne.NewSize(1000, 700))
 
 	debounced := debounce.New(400 * time.Millisecond)
@@ -78,6 +79,9 @@ func main() {
 	)
 
 	var grayScaleList uint8 = 35
+	/*if themeVariant == theme.VariantDark {
+		grayScaleList = 220
+	}*/
 	listContainer := container.NewStack(canvas.NewRectangle(color.RGBA{R: grayScaleList, G: grayScaleList, B: grayScaleList, A: 255}), listDisplay)
 
 	leftSide := container.NewBorder(vbox, nil, nil, nil, listContainer)
