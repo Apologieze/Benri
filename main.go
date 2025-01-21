@@ -228,7 +228,6 @@ func selectCorrectLinking(allAnimeList []AllAnimeIdData, animeName string, anime
 
 func changeEpisodeInApp(variation int) {
 	var currentSelected = animeSelected
-	fmt.Println("Clicked variation:", variation)
 	newNumber := *currentSelected.Progress + variation
 	fmt.Println("New number:", newNumber, *currentSelected.Progress)
 	if newNumber >= 0 && newNumber <= *currentSelected.Media.Episodes {
