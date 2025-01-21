@@ -2,6 +2,7 @@ package main
 
 import (
 	"animeFyne/anilist"
+	curd "animeFyne/curdInteg"
 	"fmt"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
@@ -22,17 +23,19 @@ import (
 	"time"
 )
 
-var animeList []verniy.MediaList
+var animeList *[]verniy.MediaList
+var window fyne.Window
+var animeSelected *verniy.MediaList
+var episodeNumber = widget.NewLabelWithStyle("", fyne.TextAlignCenter, fyne.TextStyle{Bold: true})
 
 func main() {
 	startCurdInteg()
 	fmt.Println(localAnime)
 	a := app.New()
 	//a.Settings().SetTheme(&myTheme{})
-	var animeSelected verniy.MediaList
 
-	w := a.NewWindow("AnimeGui")
-	w.Resize(fyne.NewSize(1000, 700))
+	window = a.NewWindow("AnimeGui")
+	window.Resize(fyne.NewSize(1000, 700))
 
 	debounced := debounce.New(400 * time.Millisecond)
 
@@ -47,8 +50,6 @@ func main() {
 		func(i binding.DataItem, o fyne.CanvasObject) {
 			o.(*widget.Label).Bind(i.(binding.String))
 		})
-
-	dialogC := dialog.NewCustom("Select the correct anime", "Cancel", container.NewCenter(widget.NewLabel("Salut")), w)
 
 	hello := widget.NewLabel("Hello Fyne!")
 
@@ -83,19 +84,10 @@ func main() {
 
 	go anilist.GetData(radiobox, user.Username)
 
-	// Load image from file
-	/*imgFile, err := os.Open("asset/img.png")
-	anilist.Fatal(err)
-	defer imgFile.Close()
-
-	img, _, err := image.Decode(imgFile)
-	anilist.Fatal(err)*/
-
 	imageEx := &canvas.Image{}
 
 	animeName := widget.NewLabelWithStyle("", fyne.TextAlignCenter, fyne.TextStyle{})
 
-	episodeNumber := widget.NewLabelWithStyle("", fyne.TextAlignCenter, fyne.TextStyle{Bold: true})
 	episodeMinus := widget.NewButton(" - ", func() {})
 	episodePlus := widget.NewButton(" + ", func() {})
 
@@ -108,7 +100,6 @@ func main() {
 			return
 		}
 		OnPlayButtonClick(animeName.Text, animeSelected)
-		dialogC.Show()
 	})
 
 	button.IconPlacement = widget.ButtonIconTrailingText
@@ -120,7 +111,7 @@ func main() {
 
 	listDisplay.OnSelected = func(id int) {
 		listName, err := data.GetValue(id)
-		animeSelected = animeList[id]
+		animeSelected = &(*animeList)[id]
 		if err == nil {
 			animeName.SetText(listName)
 		}
@@ -143,9 +134,9 @@ func main() {
 		imageContainer.Refresh()
 	}
 
-	w.SetContent(container.NewBorder(nil, nil, nil, imageContainer, leftSide))
+	window.SetContent(container.NewBorder(nil, nil, nil, imageContainer, leftSide))
 
-	w.ShowAndRun()
+	window.ShowAndRun()
 }
 
 func updateAnimeNames(data binding.ExternalStringList) (first bool) {
@@ -154,7 +145,7 @@ func updateAnimeNames(data binding.ExternalStringList) (first bool) {
 		return
 	}
 	tempName := make([]string, 0, 25)
-	for _, anime := range animeList {
+	for _, anime := range *animeList {
 		if name := anilist.AnimeToName(anime); name != nil {
 			tempName = append(tempName, *name)
 		} else {
@@ -203,6 +194,34 @@ func getAnimeImageFromImage(img image.Image) *canvas.Image {
 	return imageEx
 }
 
-func selectCorrectLinking(allAnimeList []AllAnimeIdData) {
+func selectCorrectLinking(allAnimeList []AllAnimeIdData, animeName string, animeProgress int) {
+	linkingList := widget.NewList(func() int {
+		return len(allAnimeList)
+	},
+		func() fyne.CanvasObject {
+			return widget.NewLabel("template")
+		},
+		func(i widget.ListItemID, o fyne.CanvasObject) {
+			o.(*widget.Label).SetText(allAnimeList[i].Name)
+		})
+
+	linkingContainer := container.NewBorder(nil, nil, nil, nil, linkingList)
+	dialogC := dialog.NewCustom("Select the correct anime", "Cancel", linkingContainer, window)
+
+	linkingList.OnSelected = func(index widget.ListItemID) {
+		fmt.Println("Selected:", allAnimeList[index])
+		dialogC.Hide()
+		err := curd.LocalUpdateAnime(databaseFile, animeSelected.Media.ID, allAnimeList[index].Id, animeProgress, 0, 0, animeName)
+		if err != nil {
+			log.Error("Can't update database file", err)
+			return
+		}
+		localAnime = curd.LocalGetAllAnime(databaseFile)
+		OnPlayButtonClick(animeName, animeSelected)
+	}
+
+	dialogC.Resize(fyne.NewSize(600, 900))
+	dialogC.Show()
 	log.Info("Select the correct anime", allAnimeList)
+
 }

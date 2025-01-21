@@ -51,13 +51,13 @@ func GetData(radio *widget.RadioGroup, username string) {
 	}
 }
 
-func FindList(categoryName string) []verniy.MediaList {
+func FindList(categoryName string) *[]verniy.MediaList {
 	if UserData == nil {
 		log.Error("No data found")
 		return nil
 	}
 	categoryIndex := categoriesToInt[categoryName]
-	return UserData[categoryIndex].Entries
+	return &UserData[categoryIndex].Entries
 }
 
 func AnimeToName(anime verniy.MediaList) *string {
