@@ -88,8 +88,8 @@ func main() {
 
 	animeName := widget.NewLabelWithStyle("", fyne.TextAlignCenter, fyne.TextStyle{})
 
-	episodeMinus := widget.NewButton(" - ", func() {})
-	episodePlus := widget.NewButton(" + ", func() {})
+	episodeMinus := widget.NewButton(" - ", func() { changeEpisodeInApp(-1) })
+	episodePlus := widget.NewButton(" + ", func() { changeEpisodeInApp(1) })
 
 	episodeContainer := container.NewHBox(layout.NewSpacer(), episodeMinus, episodeNumber, episodePlus, layout.NewSpacer())
 
@@ -224,4 +224,16 @@ func selectCorrectLinking(allAnimeList []AllAnimeIdData, animeName string, anime
 	dialogC.Show()
 	log.Info("Select the correct anime", allAnimeList)
 
+}
+
+func changeEpisodeInApp(variation int) {
+	var currentSelected = animeSelected
+	fmt.Println("Clicked variation:", variation)
+	newNumber := *currentSelected.Progress + variation
+	fmt.Println("New number:", newNumber, *currentSelected.Progress)
+	if newNumber >= 0 && newNumber <= *currentSelected.Media.Episodes {
+		go UpdateAnimeProgress(currentSelected.Media.ID, newNumber)
+		currentSelected.Progress = &newNumber
+		episodeNumber.SetText(fmt.Sprintf("Episode %d/%d", newNumber, *currentSelected.Media.Episodes))
+	}
 }
