@@ -234,6 +234,7 @@ func playingAnimeLoop(playingAnime curd.Anime, animeData *verniy.MediaList) {
 				if err == nil {
 					log.Info("Successfully updated database file")
 				}
+				localAnime = curd.LocalGetAllAnime(databaseFile)
 				break
 			}
 			if timePos != nil && playingAnime.Ep.Duration != 0 {
