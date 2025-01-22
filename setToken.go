@@ -1,7 +1,7 @@
 package main
 
 import (
-	curd "animeFyne/curdInteg"
+	curd "AnimeGUI/curdInteg"
 	"fmt"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"

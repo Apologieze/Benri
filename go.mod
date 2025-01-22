@@ -1,4 +1,4 @@
-module animeFyne
+module AnimeGUI
 
 go 1.23.2
 

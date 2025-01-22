@@ -1,7 +1,7 @@
 package main
 
 import (
-	curd "animeFyne/curdInteg"
+	curd "AnimeGUI/curdInteg"
 	"fmt"
 	"github.com/charmbracelet/log"
 	"github.com/rl404/verniy"
@@ -242,6 +242,7 @@ func playingAnimeLoop(playingAnime curd.Anime, animeData *verniy.MediaList) {
 					log.Info("Successfully updated database file")
 					localAnime = curd.LocalGetAllAnime(databaseFile)
 				}
+				displayLocalProgress()
 				break
 			}
 			if timePos != nil && playingAnime.Ep.Duration != 0 {
@@ -271,5 +272,19 @@ func deleteTokenFile() {
 	err := os.Remove(filepath.Join(os.ExpandEnv(userCurdConfig.StoragePath), "token"))
 	if err != nil {
 		log.Error(err)
+	}
+}
+
+func displayLocalProgress() {
+	localDbAnime := SearchFromLocalAniId(animeSelected.Media.ID)
+	if localDbAnime != nil {
+		episodeLastPlayback.Show()
+		if localDbAnime.Ep.Number == *animeSelected.Progress && localDbAnime.Ep.Player.PlaybackTime == 0 {
+			episodeLastPlayback.SetText(fmt.Sprintf("Just finished episode %d", localDbAnime.Ep.Number))
+		} else {
+			episodeLastPlayback.SetText(fmt.Sprintf("Last saved at EP%d: %s", localDbAnime.Ep.Number+1, time.Second*time.Duration(localDbAnime.Ep.Player.PlaybackTime)))
+		}
+	} else {
+		episodeLastPlayback.Hide()
 	}
 }

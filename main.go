@@ -1,8 +1,8 @@
 package main
 
 import (
-	"animeFyne/anilist"
-	curd "animeFyne/curdInteg"
+	"AnimeGUI/anilist"
+	curd "AnimeGUI/curdInteg"
 	"fmt"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
@@ -28,6 +28,7 @@ var window fyne.Window
 var appW fyne.App
 var animeSelected *verniy.MediaList
 var episodeNumber = widget.NewLabelWithStyle("", fyne.TextAlignCenter, fyne.TextStyle{Bold: true})
+var episodeLastPlayback = widget.NewLabelWithStyle("", fyne.TextAlignCenter, fyne.TextStyle{})
 var changedToken bool
 
 func main() {
@@ -233,7 +234,7 @@ func initMainApp() {
 
 	playContainer := container.NewHBox(layout.NewSpacer(), button, layout.NewSpacer())
 
-	imageContainer := container.NewVBox(imageEx, animeName, episodeContainer, layout.NewSpacer(), playContainer)
+	imageContainer := container.NewVBox(imageEx, animeName, episodeContainer, episodeLastPlayback, layout.NewSpacer(), playContainer)
 
 	listDisplay.OnSelected = func(id int) {
 		listName, err := data.GetValue(id)
@@ -247,6 +248,7 @@ func initMainApp() {
 		} else {
 			episodeNumber.SetText("No episode data")
 		}
+		displayLocalProgress()
 
 		imageLink := *animeSelected.Media.CoverImage.ExtraLarge
 
