@@ -1,0 +1,7 @@
+version: '3'
+
+tasks:
+  package-w:
+    cmds:
+      - go build .
+      - fyne package -os windows -icon asset/icon.jpg -name AnimeGUI
