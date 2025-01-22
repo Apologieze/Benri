@@ -173,7 +173,7 @@ func GetAnimeName(anime Anime) string {
 }
 
 // Function to update or add a new anime entry
-func LocalUpdateAnime(databaseFile string, anilistID int, allanimeID string, watchingEpisode int, playbackTime int, animeDuration int, animeName string) error {
+func LocalUpdateAnime(databaseFile string, anilistID int, allanimeID string, watchingEpisode int, playbackTime int, animeDuration int, animeName string) (error, []Anime) {
 	// Read existing entries
 	animeList := LocalGetAllAnime(databaseFile)
 
@@ -214,7 +214,7 @@ func LocalUpdateAnime(databaseFile string, anilistID int, allanimeID string, wat
 	file, err := os.Create(databaseFile)
 	if err != nil {
 		CurdOut(fmt.Sprintf("Error creating file: %v", err))
-		return err
+		return err, nil
 	}
 	defer file.Close()
 
@@ -235,7 +235,7 @@ func LocalUpdateAnime(databaseFile string, anilistID int, allanimeID string, wat
 		}
 	}
 
-	return nil
+	return nil, animeList
 }
 
 // Function to find an anime by either Anilist ID or Allanime ID

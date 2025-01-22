@@ -120,12 +120,14 @@ func selectCorrectLinking(allAnimeList []AllAnimeIdData, animeName string, anime
 	linkingList.OnSelected = func(index widget.ListItemID) {
 		fmt.Println("Selected:", allAnimeList[index])
 		dialogC.Hide()
-		err := curd.LocalUpdateAnime(databaseFile, animeSelected.Media.ID, allAnimeList[index].Id, animeProgress, 0, 0, animeName)
+		err, tempAnime := curd.LocalUpdateAnime(databaseFile, animeSelected.Media.ID, allAnimeList[index].Id, animeProgress, 0, 0, animeName)
 		if err != nil {
 			log.Error("Can't update database file", err)
 			return
 		}
-		localAnime = curd.LocalGetAllAnime(databaseFile)
+		if tempAnime != nil {
+			localAnime = tempAnime
+		}
 		OnPlayButtonClick(animeName, animeSelected)
 	}
 
@@ -185,6 +187,7 @@ func initMainApp() {
 	radiobox.Horizontal = true
 
 	toolbar := widget.NewToolbar(
+		widget.NewToolbarAction(theme.ContentAddIcon(), func() {}),
 		widget.NewToolbarSeparator(),
 		widget.NewToolbarAction(theme.ViewRefreshIcon(), func() {}),
 	)

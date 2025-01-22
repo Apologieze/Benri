@@ -111,7 +111,7 @@ func OnPlayButtonClick(animeName string, animeData *verniy.MediaList) {
 			log.Error("Failed to get allAnimeId")
 			return
 		}
-		err := curd.LocalUpdateAnime(databaseFile, animeData.Media.ID, allAnimeId, animeProgress, 0, 0, animeName)
+		err, _ := curd.LocalUpdateAnime(databaseFile, animeData.Media.ID, allAnimeId, animeProgress, 0, 0, animeName)
 		if err != nil {
 			log.Error("Can't update database file", err)
 			return
@@ -237,11 +237,11 @@ func playingAnimeLoop(playingAnime curd.Anime, animeData *verniy.MediaList) {
 					episodeNumber.SetText(fmt.Sprintf("Episode %d/%d", playingAnime.Ep.Number, playingAnime.TotalEpisodes))
 				}
 
-				err := curd.LocalUpdateAnime(databaseFile, playingAnime.AnilistId, playingAnime.AllanimeId, playingAnime.Ep.Number, playingAnime.Ep.Player.PlaybackTime, 0, playingAnime.Title.English)
-				if err == nil {
+				err, tempAnime := curd.LocalUpdateAnime(databaseFile, playingAnime.AnilistId, playingAnime.AllanimeId, playingAnime.Ep.Number, playingAnime.Ep.Player.PlaybackTime, 0, playingAnime.Title.English)
+				if err == nil && tempAnime != nil {
 					log.Info("Successfully updated database file")
+					localAnime = curd.LocalGetAllAnime(databaseFile)
 				}
-				localAnime = curd.LocalGetAllAnime(databaseFile)
 				break
 			}
 			if timePos != nil && playingAnime.Ep.Duration != 0 {
