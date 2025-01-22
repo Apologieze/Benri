@@ -25,122 +25,27 @@ import (
 
 var animeList *[]verniy.MediaList
 var window fyne.Window
+var appW fyne.App
 var animeSelected *verniy.MediaList
 var episodeNumber = widget.NewLabelWithStyle("", fyne.TextAlignCenter, fyne.TextStyle{Bold: true})
+var changedToken bool
 
 func main() {
+	var AppName = "AnimeGUI"
 	dowloadMPV()
-	startCurdInteg()
-	fmt.Println(localAnime)
-	a := app.New()
-	a.Settings().SetTheme(&forcedVariant{Theme: theme.DefaultTheme(), variant: theme.VariantDark})
-
-	window = a.NewWindow("AnimeGUI")
+	appW = app.New()
+	window = appW.NewWindow(AppName)
 	window.Resize(fyne.NewSize(1000, 700))
+	window.CenterOnScreen()
+	window.Show()
+	appW.Settings().SetTheme(&forcedVariant{Theme: theme.DefaultTheme(), variant: theme.VariantDark})
 
-	debounced := debounce.New(400 * time.Millisecond)
-
-	data := binding.BindStringList(
-		&[]string{},
-	)
-
-	listDisplay := widget.NewListWithData(data,
-		func() fyne.CanvasObject {
-			return &widget.Label{Text: "template"}
-		},
-		func(i binding.DataItem, o fyne.CanvasObject) {
-			o.(*widget.Label).Bind(i.(binding.String))
-		})
-
-	hello := widget.NewLabel("Hello Fyne!")
-
-	input := widget.NewEntry()
-	input.SetPlaceHolder("Anime name")
-	input.OnChanged = func(s string) {
-		debounced(func() {
-			hello.SetText(s)
-		})
+	startCurdInteg()
+	if !changedToken {
+		fmt.Println(window.Title(), AppName)
+		initMainApp()
+		appW.Run()
 	}
-
-	radiobox := widget.NewRadioGroup([]string{"Watching", "Planning", "Completed", "Dropped"}, func(s string) {
-		animeList = anilist.FindList(s)
-		if updateAnimeNames(data) {
-			listDisplay.Unselect(0)
-			listDisplay.Select(0)
-			listDisplay.ScrollToTop()
-		}
-	})
-	radiobox.Required = true
-	radiobox.Horizontal = true
-
-	vbox := container.NewVBox(
-		input,
-		radiobox,
-	)
-
-	var grayScaleList uint8 = 35
-	/*if themeVariant == theme.VariantDark {
-		grayScaleList = 220
-	}*/
-	listContainer := container.NewStack(canvas.NewRectangle(color.RGBA{R: grayScaleList, G: grayScaleList, B: grayScaleList, A: 255}), listDisplay)
-
-	leftSide := container.NewBorder(vbox, nil, nil, nil, listContainer)
-
-	go anilist.GetData(radiobox, user.Username)
-
-	imageEx := &canvas.Image{}
-
-	animeName := widget.NewLabelWithStyle("", fyne.TextAlignCenter, fyne.TextStyle{})
-
-	episodeMinus := widget.NewButton(" - ", func() { changeEpisodeInApp(-1) })
-	episodePlus := widget.NewButton(" + ", func() { changeEpisodeInApp(1) })
-
-	episodeContainer := container.NewHBox(layout.NewSpacer(), episodeMinus, episodeNumber, episodePlus, layout.NewSpacer())
-
-	button := widget.NewButtonWithIcon("Play!", theme.MediaPlayIcon(), func() {
-		//fmt.Println(anilist.Search())
-		fmt.Println(animeSelected.Media.ID)
-		if animeName.Text == "" {
-			return
-		}
-		OnPlayButtonClick(animeName.Text, animeSelected)
-	})
-
-	button.IconPlacement = widget.ButtonIconTrailingText
-	button.Importance = widget.HighImportance
-
-	playContainer := container.NewHBox(layout.NewSpacer(), button, layout.NewSpacer())
-
-	imageContainer := container.NewVBox(imageEx, animeName, episodeContainer, layout.NewSpacer(), playContainer)
-
-	listDisplay.OnSelected = func(id int) {
-		listName, err := data.GetValue(id)
-		animeSelected = &(*animeList)[id]
-		if err == nil {
-			animeName.SetText(listName)
-		}
-
-		if animeSelected.Progress != nil && animeSelected.Media.Episodes != nil {
-			episodeNumber.SetText(fmt.Sprintf("Episode %d/%d", *animeSelected.Progress, *animeSelected.Media.Episodes))
-		} else {
-			episodeNumber.SetText("No episode data")
-		}
-
-		imageLink := *animeSelected.Media.CoverImage.ExtraLarge
-
-		imageFile := GetImageFromUrl(imageLink)
-		if imageFile == nil {
-			log.Error("No image found")
-			return
-		}
-
-		*imageEx = *getAnimeImageFromImage(imageFile)
-		imageContainer.Refresh()
-	}
-
-	window.SetContent(container.NewBorder(nil, nil, nil, imageContainer, leftSide))
-
-	window.ShowAndRun()
 }
 
 func updateAnimeNames(data binding.ExternalStringList) (first bool) {
@@ -239,4 +144,118 @@ func changeEpisodeInApp(variation int) {
 		currentSelected.Progress = &newNumber
 		episodeNumber.SetText(fmt.Sprintf("Episode %d/%d", newNumber, *currentSelected.Media.Episodes))
 	}
+}
+
+func initMainApp() {
+	secondCurdInit()
+	window.SetTitle("AnimeGUI")
+	fmt.Println(localAnime)
+
+	debounced := debounce.New(400 * time.Millisecond)
+
+	data := binding.BindStringList(
+		&[]string{},
+	)
+
+	listDisplay := widget.NewListWithData(data,
+		func() fyne.CanvasObject {
+			return &widget.Label{Text: "template"}
+		},
+		func(i binding.DataItem, o fyne.CanvasObject) {
+			o.(*widget.Label).Bind(i.(binding.String))
+		})
+
+	input := widget.NewEntry()
+	input.SetPlaceHolder("Anime name")
+	input.OnChanged = func(s string) {
+		debounced(func() {
+			fmt.Println(s)
+		})
+	}
+
+	radiobox := widget.NewRadioGroup([]string{"Watching", "Planning", "Completed", "Dropped"}, func(s string) {
+		animeList = anilist.FindList(s)
+		if updateAnimeNames(data) {
+			listDisplay.Unselect(0)
+			listDisplay.Select(0)
+			listDisplay.ScrollToTop()
+		}
+	})
+	radiobox.Required = true
+	radiobox.Horizontal = true
+
+	toolbar := widget.NewToolbar(
+		widget.NewToolbarSeparator(),
+		widget.NewToolbarAction(theme.ViewRefreshIcon(), func() {}),
+	)
+
+	inputContainer := container.NewBorder(nil, nil, nil, toolbar, input)
+
+	vbox := container.NewVBox(
+		inputContainer,
+		radiobox,
+	)
+
+	var grayScaleList uint8 = 35
+	/*if themeVariant == theme.VariantDark {
+		grayScaleList = 220
+	}*/
+	listContainer := container.NewStack(canvas.NewRectangle(color.RGBA{R: grayScaleList, G: grayScaleList, B: grayScaleList, A: 255}), listDisplay)
+
+	leftSide := container.NewBorder(vbox, nil, nil, nil, listContainer)
+
+	go anilist.GetData(radiobox, user.Username)
+
+	imageEx := &canvas.Image{}
+
+	animeName := widget.NewLabelWithStyle("", fyne.TextAlignCenter, fyne.TextStyle{Bold: true})
+	animeName.Wrapping = fyne.TextWrapWord
+
+	episodeMinus := widget.NewButton(" - ", func() { changeEpisodeInApp(-1) })
+	episodePlus := widget.NewButton(" + ", func() { changeEpisodeInApp(1) })
+
+	episodeContainer := container.NewHBox(layout.NewSpacer(), episodeMinus, episodeNumber, episodePlus, layout.NewSpacer())
+
+	button := widget.NewButtonWithIcon("Play!", theme.MediaPlayIcon(), func() {
+		//fmt.Println(anilist.Search())
+		fmt.Println(animeSelected.Media.ID)
+		if animeName.Text == "" {
+			return
+		}
+		OnPlayButtonClick(animeName.Text, animeSelected)
+	})
+
+	button.IconPlacement = widget.ButtonIconTrailingText
+	button.Importance = widget.HighImportance
+
+	playContainer := container.NewHBox(layout.NewSpacer(), button, layout.NewSpacer())
+
+	imageContainer := container.NewVBox(imageEx, animeName, episodeContainer, layout.NewSpacer(), playContainer)
+
+	listDisplay.OnSelected = func(id int) {
+		listName, err := data.GetValue(id)
+		animeSelected = &(*animeList)[id]
+		if err == nil {
+			animeName.SetText(listName)
+		}
+
+		if animeSelected.Progress != nil && animeSelected.Media.Episodes != nil {
+			episodeNumber.SetText(fmt.Sprintf("Episode %d/%d", *animeSelected.Progress, *animeSelected.Media.Episodes))
+		} else {
+			episodeNumber.SetText("No episode data")
+		}
+
+		imageLink := *animeSelected.Media.CoverImage.ExtraLarge
+
+		imageFile := GetImageFromUrl(imageLink)
+		if imageFile == nil {
+			log.Error("No image found")
+			return
+		}
+
+		*imageEx = *getAnimeImageFromImage(imageFile)
+		imageContainer.Refresh()
+	}
+
+	window.SetContent(container.NewBorder(nil, nil, nil, imageContainer, leftSide))
 }

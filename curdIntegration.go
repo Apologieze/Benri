@@ -48,9 +48,16 @@ func startCurdInteg() {
 		log.Error("Error reading token", logFile)
 	}
 	if user.Token == "" {
+		setTokenGraphicaly(filepath.Join(os.ExpandEnv(userCurdConfig.StoragePath), "token"), &user)
+	}
+}
+
+func secondCurdInit() {
+	if user.Token == "" {
 		curd.ChangeToken(&userCurdConfig, &user)
 	}
 
+	var err error
 	if user.Id == 0 {
 		user.Id, user.Username, err = curd.GetAnilistUserID(user.Token)
 		if err != nil {
