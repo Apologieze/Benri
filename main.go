@@ -204,7 +204,7 @@ func initMainApp() {
 	/*if themeVariant == theme.VariantDark {
 		grayScaleList = 220
 	}*/
-	listContainer := container.NewStack(canvas.NewRectangle(color.RGBA{R: grayScaleList, G: grayScaleList, B: grayScaleList, A: 255}), listDisplay)
+	listContainer := container.NewPadded(&canvas.Rectangle{FillColor: color.RGBA{R: grayScaleList, G: grayScaleList, B: grayScaleList, A: 255}, CornerRadius: 10}, listDisplay)
 
 	leftSide := container.NewBorder(vbox, nil, nil, nil, listContainer)
 
