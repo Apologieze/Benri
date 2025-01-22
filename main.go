@@ -204,7 +204,7 @@ func initMainApp() {
 
 	leftSide := container.NewBorder(vbox, nil, nil, nil, listContainer)
 
-	go anilist.GetData(radiobox, user.Username)
+	go anilist.GetData(radiobox, user.Username, deleteTokenFile)
 
 	imageEx := &canvas.Image{}
 

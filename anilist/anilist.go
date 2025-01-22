@@ -38,11 +38,15 @@ var categoriesToInt = map[string]int{
 	"Planning":  3,
 }
 
-func GetData(radio *widget.RadioGroup, username string) {
+func GetData(radio *widget.RadioGroup, username string, delete func()) {
 	v := verniy.New()
 
 	typeAnime, err := v.GetUserAnimeList(username, fields...)
-	Fatal(err)
+	if err != nil {
+		typeAnime = make([]verniy.MediaListGroup, 4)
+		log.Error("Invalid token")
+		delete()
+	}
 	UserData = typeAnime
 	if radio != nil {
 		if radio.Selected == "" {
@@ -73,8 +77,8 @@ func AnimeToName(anime verniy.MediaList) *string {
 	return anime.Media.Title.Romaji
 }
 
-func Fatal(err error) {
+/*func Fatal(err error) {
 	if err != nil {
 		log.Fatal(err)
 	}
-}
+}*/

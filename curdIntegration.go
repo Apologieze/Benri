@@ -266,3 +266,10 @@ func UpdateAnimeProgress(animeId int, episode int) {
 	}
 
 }
+
+func deleteTokenFile() {
+	err := os.Remove(filepath.Join(os.ExpandEnv(userCurdConfig.StoragePath), "token"))
+	if err != nil {
+		log.Error(err)
+	}
+}
