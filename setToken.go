@@ -23,7 +23,7 @@ func setTokenGraphicaly(tokenPath string, user *curd.User) {
 
 	})*/
 
-	urlLink, _ := url.Parse("https://anilist.co/api/v2/oauth/authorize?client_id=20686&response_type=token")
+	urlLink, _ := url.Parse("https://anilist.co/api/v2/oauth/authorize?client_id=23782&response_type=token")
 	err := appW.OpenURL(urlLink)
 	if err != nil {
 		log.Error("Error opening url", err)
