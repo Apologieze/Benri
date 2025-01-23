@@ -10,6 +10,8 @@ import (
 )
 
 func dowloadMPV() {
+	defer func() { mpvPresent = true }()
+
 	log.Info(runtime.GOOS)
 	if runtime.GOOS != "windows" {
 		return
@@ -50,7 +52,9 @@ func dowloadMPV() {
 		log.Error("Error creating mpv.exe file:", err)
 		return
 	}
-	defer out.Close()
+	defer func(out *os.File) {
+		_ = out.Close()
+	}(out)
 
 	_, err = io.Copy(out, resp.Body)
 	if err != nil {

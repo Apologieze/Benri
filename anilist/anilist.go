@@ -1,9 +1,12 @@
 package anilist
 
 import (
+	"fmt"
 	"fyne.io/fyne/v2/widget"
 	"github.com/charmbracelet/log"
 	"github.com/rl404/verniy"
+	"net/url"
+	"strings"
 )
 
 var fields = []verniy.MediaListGroupField{
@@ -15,6 +18,11 @@ var fields = []verniy.MediaListGroupField{
 		verniy.MediaListFieldProgress,
 		verniy.MediaListFieldMedia(
 			verniy.MediaFieldID,
+			verniy.MediaFieldNextAiringEpisode(
+				verniy.AiringScheduleFieldEpisode,
+				verniy.AiringScheduleFieldAiringAt,
+				verniy.AiringScheduleFieldTimeUntilAiring,
+			),
 			verniy.MediaFieldTitle(
 				verniy.MediaTitleFieldRomaji,
 				verniy.MediaTitleFieldEnglish,
@@ -31,12 +39,14 @@ var fields = []verniy.MediaListGroupField{
 
 var UserData []verniy.MediaListGroup
 
-var categoriesToInt = map[string]int{
+var categoriesToInt = make(map[string]int)
+
+/*var categoriesToInt = map[string]int{
 	"Completed": 0,
 	"Dropped":   1,
 	"Watching":  2,
 	"Planning":  3,
-}
+}*/
 
 func GetData(radio *widget.RadioGroup, username string, delete func()) {
 	v := verniy.New()
@@ -48,6 +58,13 @@ func GetData(radio *widget.RadioGroup, username string, delete func()) {
 		delete()
 	}
 	UserData = typeAnime
+	categoriesToInt = make(map[string]int)
+	for i := 0; i < len(typeAnime); i++ {
+		if typeAnime[i].Name != nil {
+			categoriesToInt[*typeAnime[i].Name] = i
+		}
+	}
+
 	if radio != nil {
 		if radio.Selected == "" {
 			radio.SetSelected("Watching")
@@ -60,7 +77,11 @@ func FindList(categoryName string) *[]verniy.MediaList {
 		log.Error("No data found")
 		return nil
 	}
-	categoryIndex := categoriesToInt[categoryName]
+	categoryIndex, exists := categoriesToInt[categoryName]
+	if !exists {
+		log.Error("Category not found in user")
+		return &[]verniy.MediaList{}
+	}
 	return &UserData[categoryIndex].Entries
 }
 
@@ -77,8 +98,33 @@ func AnimeToName(anime verniy.MediaList) *string {
 	return anime.Media.Title.Romaji
 }
 
-/*func Fatal(err error) {
-	if err != nil {
-		log.Fatal(err)
+func FormatDuration(seconds int) string {
+	days := seconds / 86400
+	remaining := seconds % 86400
+	hours := remaining / 3600
+	remaining %= 3600
+	minutes := remaining / 60
+
+	var parts []string
+
+	if days > 0 {
+		parts = append(parts, fmt.Sprintf("%d days", days))
 	}
-}*/
+	if hours > 0 {
+		parts = append(parts, fmt.Sprintf("%dh", hours))
+	}
+	// Include minutes if it's non-zero or no parts exist (e.g., 0d 0h 0m → "0m")
+	if minutes > 0 || len(parts) == 0 {
+		parts = append(parts, fmt.Sprintf("%dm", minutes))
+	}
+
+	return strings.Join(parts, " ")
+}
+
+func IdToUrl(id int) *url.URL {
+	u, err := url.Parse(fmt.Sprintf("https://anilist.co/anime/%d", id))
+	if err != nil {
+		return nil
+	}
+	return u
+}

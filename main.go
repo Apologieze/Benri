@@ -20,6 +20,7 @@ import (
 	"image/color"
 	"io"
 	"net/http"
+	"net/url"
 	"time"
 )
 
@@ -30,10 +31,11 @@ var animeSelected *verniy.MediaList
 var episodeNumber = widget.NewLabelWithStyle("", fyne.TextAlignCenter, fyne.TextStyle{Bold: true})
 var episodeLastPlayback = widget.NewLabelWithStyle("", fyne.TextAlignCenter, fyne.TextStyle{})
 var changedToken bool
+var mpvPresent bool
 
 func main() {
 	var AppName = "AnimeGUI"
-	dowloadMPV()
+	go dowloadMPV()
 	appW = app.New()
 	window = appW.NewWindow(AppName)
 	window.Resize(fyne.NewSize(1000, 700))
@@ -119,7 +121,7 @@ func selectCorrectLinking(allAnimeList []AllAnimeIdData, animeName string, anime
 	dialogC := dialog.NewCustom("Select the correct anime", "Cancel", linkingContainer, window)
 
 	linkingList.OnSelected = func(index widget.ListItemID) {
-		fmt.Println("Selected:", allAnimeList[index])
+		fmt.Print("Selected:", allAnimeList[index])
 		dialogC.Hide()
 		err, tempAnime := curd.LocalUpdateAnime(databaseFile, animeSelected.Media.ID, allAnimeList[index].Id, animeProgress, 0, 0, animeName)
 		if err != nil {
@@ -191,6 +193,20 @@ func initMainApp() {
 		widget.NewToolbarAction(theme.ContentAddIcon(), func() {}),
 		widget.NewToolbarSeparator(),
 		widget.NewToolbarAction(theme.ViewRefreshIcon(), func() {}),
+		widget.NewToolbarSeparator(),
+		widget.NewToolbarAction(theme.MailAttachmentIcon(), func() {
+			if animeSelected == nil {
+				_ = appW.OpenURL(&url.URL{Scheme: "https", Host: "anilist.co", Path: "search/anime"})
+				return
+			}
+			urlId := anilist.IdToUrl(animeSelected.Media.ID)
+			if urlId != nil {
+				err := appW.OpenURL(urlId)
+				if err != nil {
+					log.Error("Can't open url", err)
+				}
+			}
+		}),
 	)
 
 	inputContainer := container.NewBorder(nil, nil, nil, toolbar, input)
@@ -220,6 +236,9 @@ func initMainApp() {
 
 	episodeContainer := container.NewHBox(layout.NewSpacer(), episodeMinus, episodeNumber, episodePlus, layout.NewSpacer())
 
+	nextEpisodeLabel := widget.NewLabelWithStyle("", fyne.TextAlignCenter, fyne.TextStyle{Bold: true})
+	nextEpisodeLabel.Hide()
+
 	button := widget.NewButtonWithIcon("Play!", theme.MediaPlayIcon(), func() {
 		//fmt.Println(anilist.Search())
 		fmt.Println(animeSelected.Media.ID)
@@ -234,13 +253,20 @@ func initMainApp() {
 
 	playContainer := container.NewHBox(layout.NewSpacer(), button, layout.NewSpacer())
 
-	imageContainer := container.NewVBox(imageEx, animeName, episodeContainer, episodeLastPlayback, layout.NewSpacer(), playContainer)
+	imageContainer := container.NewVBox(imageEx, animeName, episodeContainer, nextEpisodeLabel, episodeLastPlayback, layout.NewSpacer(), playContainer)
 
 	listDisplay.OnSelected = func(id int) {
 		listName, err := data.GetValue(id)
 		animeSelected = &(*animeList)[id]
 		if err == nil {
 			animeName.SetText(listName)
+		}
+
+		if animeSelected.Media.NextAiringEpisode != nil {
+			nextEpisodeLabel.SetText(fmt.Sprintf("Episode %d releasing in %s", animeSelected.Media.NextAiringEpisode.Episode, anilist.FormatDuration(animeSelected.Media.NextAiringEpisode.TimeUntilAiring)))
+			nextEpisodeLabel.Show()
+		} else {
+			nextEpisodeLabel.Hide()
 		}
 
 		if animeSelected.Progress != nil && animeSelected.Media.Episodes != nil {

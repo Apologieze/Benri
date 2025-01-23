@@ -39,13 +39,13 @@ func startCurdInteg() {
 	}
 	curd.SetGlobalConfig(&userCurdConfig)
 
-	logFile := filepath.Join(os.ExpandEnv(userCurdConfig.StoragePath), "debug.log")
+	//var logFile = filepath.Join(os.ExpandEnv(userCurdConfig.StoragePath), "debug.log")
 	//curd.ClearLogFile(logFile)
 
 	// Get the token from the token file
 	user.Token, err = curd.GetTokenFromFile(filepath.Join(os.ExpandEnv(userCurdConfig.StoragePath), "token"))
 	if err != nil {
-		log.Error("Error reading token", logFile)
+		log.Error("Error reading token")
 	}
 	if user.Token == "" {
 		setTokenGraphicaly(filepath.Join(os.ExpandEnv(userCurdConfig.StoragePath), "token"), &user)
@@ -95,6 +95,10 @@ type AllAnimeIdData struct {
 }
 
 func OnPlayButtonClick(animeName string, animeData *verniy.MediaList) {
+	if mpvPresent == false {
+		log.Error("MPV is not yet dl")
+		return
+	}
 	if animeData == nil {
 		log.Error("Anime data is nil")
 		return
@@ -280,9 +284,9 @@ func displayLocalProgress() {
 	if localDbAnime != nil {
 		episodeLastPlayback.Show()
 		if localDbAnime.Ep.Number == *animeSelected.Progress && localDbAnime.Ep.Player.PlaybackTime == 0 {
-			episodeLastPlayback.SetText(fmt.Sprintf("Just finished episode %d", localDbAnime.Ep.Number))
+			episodeLastPlayback.SetText(fmt.Sprintf("Just finished Episode %d", localDbAnime.Ep.Number))
 		} else {
-			episodeLastPlayback.SetText(fmt.Sprintf("Last saved at EP%d: %s", localDbAnime.Ep.Number+1, time.Second*time.Duration(localDbAnime.Ep.Player.PlaybackTime)))
+			episodeLastPlayback.SetText(fmt.Sprintf("Last saved at Episode %d: %s", localDbAnime.Ep.Number+1, time.Second*time.Duration(localDbAnime.Ep.Player.PlaybackTime)))
 		}
 	} else {
 		episodeLastPlayback.Hide()
