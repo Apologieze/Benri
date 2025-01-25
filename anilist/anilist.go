@@ -48,10 +48,10 @@ var categoriesToInt = make(map[string]int)
 	"Planning":  3,
 }*/
 
-func GetData(radio *widget.RadioGroup, username string, delete func()) {
-	v := verniy.New()
+var Client *verniy.Client = verniy.New()
 
-	typeAnime, err := v.GetUserAnimeList(username, fields...)
+func GetData(radio *widget.RadioGroup, username string, delete func()) {
+	typeAnime, err := Client.GetUserAnimeList(username, fields...)
 	if err != nil {
 		typeAnime = make([]verniy.MediaListGroup, 4)
 		log.Error("Invalid token")
@@ -127,4 +127,14 @@ func IdToUrl(id int) *url.URL {
 		return nil
 	}
 	return u
+}
+
+func SearchFromQuery(strQuery string) *[]verniy.Media {
+	query := verniy.PageParamMedia{Search: strQuery}
+	result, err := Client.SearchAnime(query, 1, 10)
+	if err != nil {
+		log.Error("Error searching anime:", err)
+		return nil
+	}
+	return &result.Media
 }

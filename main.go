@@ -153,6 +153,7 @@ func changeEpisodeInApp(variation int) {
 
 func initMainApp() {
 	secondCurdInit()
+	anilist.Client.AccessToken = user.Token
 	window.SetTitle("AnimeGUI")
 	fmt.Println(localAnime)
 
@@ -190,7 +191,13 @@ func initMainApp() {
 	radiobox.Horizontal = true
 
 	toolbar := widget.NewToolbar(
-		widget.NewToolbarAction(theme.ContentAddIcon(), func() {}),
+		widget.NewToolbarAction(theme.ContentAddIcon(), func() {
+			result := anilist.SearchFromQuery(input.Text)
+			if result == nil {
+				return
+			}
+			fmt.Printf("Result: %+v\n", *result)
+		}),
 		widget.NewToolbarSeparator(),
 		widget.NewToolbarAction(theme.ViewRefreshIcon(), func() {}),
 		widget.NewToolbarSeparator(),
