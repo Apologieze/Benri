@@ -32,6 +32,7 @@ var episodeNumber = widget.NewLabelWithStyle("", fyne.TextAlignCenter, fyne.Text
 var episodeLastPlayback = widget.NewLabelWithStyle("", fyne.TextAlignCenter, fyne.TextStyle{})
 var changedToken bool
 var mpvPresent bool
+var grayScaleList uint8 = 35
 
 func main() {
 	var AppName = "AnimeGUI"
@@ -58,7 +59,7 @@ func updateAnimeNames(data binding.ExternalStringList) (first bool) {
 	}
 	tempName := make([]string, 0, 25)
 	for _, anime := range *animeList {
-		if name := anilist.AnimeToName(anime); name != nil {
+		if name := anilist.AnimeToName(anime.Media); name != nil {
 			tempName = append(tempName, *name)
 		} else {
 			tempName = append(tempName, "Error name")
@@ -192,11 +193,7 @@ func initMainApp() {
 
 	toolbar := widget.NewToolbar(
 		widget.NewToolbarAction(theme.ContentAddIcon(), func() {
-			result := anilist.SearchFromQuery(input.Text)
-			if result == nil {
-				return
-			}
-			fmt.Printf("Result: %+v\n", *result)
+			setDialogAddAnime()
 		}),
 		widget.NewToolbarSeparator(),
 		widget.NewToolbarAction(theme.ViewRefreshIcon(), func() {}),
@@ -223,7 +220,6 @@ func initMainApp() {
 		radiobox,
 	)
 
-	var grayScaleList uint8 = 35
 	/*if themeVariant == theme.VariantDark {
 		grayScaleList = 220
 	}*/

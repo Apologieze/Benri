@@ -85,17 +85,17 @@ func FindList(categoryName string) *[]verniy.MediaList {
 	return &UserData[categoryIndex].Entries
 }
 
-func AnimeToName(anime verniy.MediaList) *string {
-	if anime.Media == nil {
+func AnimeToName(anime *verniy.Media) *string {
+	if anime == nil {
 		return nil
 	}
-	if anime.Media.Title == nil {
+	if anime.Title == nil {
 		return nil
 	}
-	if anime.Media.Title.English != nil {
-		return anime.Media.Title.English
+	if anime.Title.English != nil {
+		return anime.Title.English
 	}
-	return anime.Media.Title.Romaji
+	return anime.Title.Romaji
 }
 
 func FormatDuration(seconds int) string {
@@ -129,12 +129,15 @@ func IdToUrl(id int) *url.URL {
 	return u
 }
 
-func SearchFromQuery(strQuery string) *[]verniy.Media {
+func SearchFromQuery(strQuery string) []verniy.Media {
+	if strQuery == "" {
+		return nil
+	}
 	query := verniy.PageParamMedia{Search: strQuery}
-	result, err := Client.SearchAnime(query, 1, 10)
+	result, err := Client.SearchAnime(query, 1, 15)
 	if err != nil {
 		log.Error("Error searching anime:", err)
 		return nil
 	}
-	return &result.Media
+	return result.Media
 }
