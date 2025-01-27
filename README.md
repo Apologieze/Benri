@@ -1,6 +1,10 @@
-# AnimeGUI  ![](https://img.shields.io/badge/Go-2e1c3b?style=for-the-badge&logo=go)
+<h1> AnimeGUI  <img src="https://img.shields.io/badge/Go-2e1c3b?style=for-the-badge&logo=go"> </h1>
 
-## Anime watching native cross-platform app made in Golang
+<div align="center">
+<h3> Anime watching native cross-platform app made in Golang </h3>
+<img src="https://github.com/user-attachments/assets/639dd363-8d79-4ddf-816a-380774deba4f" width="900">
+</div>
+<br>
 
 ## Download
 - If you're on Windows, you can download the latest executable [here](https://apologize.fr/AnimeGUI.exe) <br>
