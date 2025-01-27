@@ -1,7 +1,7 @@
 package main
 
 import (
-	"AnimeGUI/anilist"
+	"AnimeGUI/src/anilist"
 	"fmt"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
@@ -49,6 +49,7 @@ func setDialogAddAnime() {
 		fmt.Printf("Result: %+v\n", result)
 	}
 	buttonSearch := widget.NewButtonWithIcon("", theme.SearchIcon(), func() { inputSearch.OnSubmitted(inputSearch.Text) })
+	buttonSearch.Importance = widget.WarningImportance
 	searchBar := container.NewBorder(nil, nil, nil, buttonSearch, inputSearch)
 
 	dialogAdd := dialog.NewCustom("Add new anime from Anilist", "Cancel", container.NewBorder(searchBar, nil, nil, nil, listContainer), window)

@@ -1,8 +1,8 @@
 package main
 
 import (
-	"AnimeGUI/anilist"
 	curd "AnimeGUI/curdInteg"
+	"AnimeGUI/src/anilist"
 	"fmt"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
@@ -173,7 +173,7 @@ func initMainApp() {
 		})
 
 	input := widget.NewEntry()
-	input.SetPlaceHolder("Anime name")
+	input.SetPlaceHolder("Filter anime name")
 	input.OnChanged = func(s string) {
 		debounced(func() {
 			fmt.Println(s)
@@ -192,11 +192,11 @@ func initMainApp() {
 	radiobox.Horizontal = true
 
 	toolbar := widget.NewToolbar(
+		widget.NewToolbarAction(theme.ViewRefreshIcon(), func() {}),
+		widget.NewToolbarSeparator(),
 		widget.NewToolbarAction(theme.ContentAddIcon(), func() {
 			setDialogAddAnime()
 		}),
-		widget.NewToolbarSeparator(),
-		widget.NewToolbarAction(theme.ViewRefreshIcon(), func() {}),
 		widget.NewToolbarSeparator(),
 		widget.NewToolbarAction(theme.MailAttachmentIcon(), func() {
 			if animeSelected == nil {
