@@ -93,10 +93,10 @@ func GetImageFromUrl(url string) image.Image {
 	return img
 }
 
-func getAnimeImageFromImage(img image.Image) *canvas.Image {
+func getAnimeImageFromImage(img image.Image, newWidth float32) *canvas.Image {
 	size := img.Bounds().Size()
 	ratio := float32(size.X) / float32(size.Y)
-	var newWidth float32 = 300
+
 	newHeight := newWidth / ratio
 
 	imageEx := canvas.NewImageFromImage(img)
@@ -287,7 +287,7 @@ func initMainApp() {
 			return
 		}
 
-		*imageEx = *getAnimeImageFromImage(imageFile)
+		*imageEx = *getAnimeImageFromImage(imageFile, 300)
 		imageContainer.Refresh()
 	}
 
