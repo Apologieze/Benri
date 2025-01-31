@@ -257,7 +257,7 @@ func initMainApp() {
 
 	playContainer := container.NewHBox(layout.NewSpacer(), button, layout.NewSpacer())
 
-	imageContainer := container.NewVBox(imageEx, animeName, episodeContainer, nextEpisodeLabel, episodeLastPlayback, layout.NewSpacer(), playContainer)
+	imageContainer := container.NewVBox(imageEx, animeName, episodeContainer, nextEpisodeLabel, episodeLastPlayback, layout.NewSpacer(), canvas.NewText("FEUR", color.RGBA{255, 0, 0, 255}), playContainer)
 
 	listDisplay.OnSelected = func(id int) {
 		listName, err := data.GetValue(id)

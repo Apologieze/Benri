@@ -37,12 +37,16 @@ func (f *forcedVariant) Color(name fyne.ThemeColorName, _ fyne.ThemeVariant) col
 }
 
 func (f *forcedVariant) Size(s fyne.ThemeSizeName) float32 {
-	if s == theme.SizeNameSelectionRadius {
+	switch s {
+	case theme.SizeNameSelectionRadius:
 		return 10
-	} else if s == theme.SizeNameSeparatorThickness {
+	case theme.SizeNameInputRadius:
+		return 10
+	case theme.SizeNameSeparatorThickness:
 		return 2
+	default:
+		return f.Theme.Size(s)
 	}
-	return f.Theme.Size(s)
 }
 
 /*func (f *forcedVariant) Font(style fyne.TextStyle) fyne.Resource {
