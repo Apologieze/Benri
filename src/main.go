@@ -24,25 +24,33 @@ import (
 	"time"
 )
 
-var animeList *[]verniy.MediaList
-var window fyne.Window
-var appW fyne.App
-var animeSelected *verniy.MediaList
-var episodeNumber = widget.NewLabelWithStyle("", fyne.TextAlignCenter, fyne.TextStyle{Bold: true})
-var episodeLastPlayback = widget.NewLabelWithStyle("", fyne.TextAlignCenter, fyne.TextStyle{})
-var changedToken bool
-var mpvPresent bool
-var grayScaleList uint8 = 35
+var (
+	animeList           *[]verniy.MediaList
+	animeSelected       *verniy.MediaList
+	window              fyne.Window
+	appW                fyne.App
+	episodeNumber       = widget.NewLabelWithStyle("", fyne.TextAlignCenter, fyne.TextStyle{Bold: true})
+	episodeLastPlayback = widget.NewLabelWithStyle("", fyne.TextAlignCenter, fyne.TextStyle{})
+	changedToken        bool
+	mpvPresent          bool
+	grayScaleList       uint8 = 35
+)
 
 func main() {
-	var AppName = "AnimeGUI"
+	const AppName = "AnimeGUI"
+
 	go dowloadMPV()
+
 	appW = app.New()
 	window = appW.NewWindow(AppName)
 	window.Resize(fyne.NewSize(1000, 700))
 	window.CenterOnScreen()
 	window.Show()
-	appW.Settings().SetTheme(&forcedVariant{Theme: theme.DefaultTheme(), variant: theme.VariantDark})
+
+	appW.Settings().SetTheme(&forcedVariant{
+		Theme:   theme.DefaultTheme(),
+		variant: theme.VariantDark,
+	})
 	log.Info("Color", appW.Settings().Theme().Color(theme.ColorNameFocus, theme.VariantDark))
 
 	startCurdInteg()
