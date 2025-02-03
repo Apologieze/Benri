@@ -51,7 +51,7 @@ func main() {
 		Theme:   theme.DefaultTheme(),
 		variant: theme.VariantDark,
 	})
-	log.Info("Color", appW.Settings().Theme().Color(theme.ColorNameFocus, theme.VariantDark))
+	//log.Info("Color", appW.Settings().Theme().Color(theme.ColorNameFocus, theme.VariantDark))
 
 	startCurdInteg()
 	if !changedToken {
