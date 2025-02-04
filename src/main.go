@@ -248,7 +248,8 @@ func initMainApp() {
 
 	episodeContainer := container.NewHBox(layout.NewSpacer(), episodeMinus, episodeNumber, episodePlus, layout.NewSpacer())
 
-	nextEpisodeLabel := widget.NewLabelWithStyle("", fyne.TextAlignCenter, fyne.TextStyle{Bold: true})
+	//nextEpisodeLabel := widget.NewLabelWithStyle("", fyne.TextAlignCenter, fyne.TextStyle{Bold: true})
+	nextEpisodeLabel := &canvas.Text{Text: "", Color: color.RGBA{156, 190, 93, 255}, Alignment: fyne.TextAlignCenter, TextStyle: fyne.TextStyle{Bold: true}, TextSize: theme.TextSize()}
 	nextEpisodeLabel.Hide()
 
 	button := widget.NewButtonWithIcon("Play!", theme.MediaPlayIcon(), func() {
@@ -265,7 +266,7 @@ func initMainApp() {
 
 	playContainer := container.NewHBox(layout.NewSpacer(), button, layout.NewSpacer())
 
-	imageContainer := container.NewVBox(imageEx, animeName, episodeContainer, nextEpisodeLabel, episodeLastPlayback, layout.NewSpacer(), canvas.NewText("FEUR", color.RGBA{255, 0, 0, 255}), playContainer)
+	imageContainer := container.NewVBox(imageEx, animeName, episodeContainer, nextEpisodeLabel, episodeLastPlayback, layout.NewSpacer(), playContainer)
 
 	listDisplay.OnSelected = func(id int) {
 		listName, err := data.GetValue(id)
@@ -275,8 +276,9 @@ func initMainApp() {
 		}
 
 		if animeSelected.Media.NextAiringEpisode != nil {
-			nextEpisodeLabel.SetText(fmt.Sprintf("Episode %d releasing in %s", animeSelected.Media.NextAiringEpisode.Episode, anilist.FormatDuration(animeSelected.Media.NextAiringEpisode.TimeUntilAiring)))
+			nextEpisodeLabel.Text = fmt.Sprintf("Episode %d releasing in %s", animeSelected.Media.NextAiringEpisode.Episode, anilist.FormatDuration(animeSelected.Media.NextAiringEpisode.TimeUntilAiring))
 			nextEpisodeLabel.Show()
+			nextEpisodeLabel.Refresh()
 		} else {
 			nextEpisodeLabel.Hide()
 		}

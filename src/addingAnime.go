@@ -17,27 +17,29 @@ import (
 )
 
 var displayToCategories = map[string]string{
-	"Currently Watching": "CURRENT",
-	"Completed":          "COMPLETED",
-	"On Hold":            "PAUSED",
-	"Dropped":            "DROPPED",
-	"Plan to Watch":      "PLANNING",
+	"Watching":      "CURRENT",
+	"Completed":     "COMPLETED",
+	"Paused":        "PAUSED",
+	"Dropped":       "DROPPED",
+	"Plan to Watch": "PLANNING",
 }
 
 var displayCategories = []string{
-	"Currently Watching",
+	"Watching",
 	"Plan to Watch",
 	"Completed",
-	"On Hold",
+	"Paused",
 	"Dropped",
 }
 
 func setDialogAddAnime() {
 	var searchResult []verniy.Media
+	var selectedAnime *verniy.Media
 	isAnimeSelected := binding.NewBool()
 
 	animeImageHolder := &canvas.Image{}
 	selectCategory := widget.NewSelect(displayCategories, func(s string) {})
+	selectCategory.Alignment = fyne.TextAlignCenter
 	selectCategory.SetSelected(displayCategories[0])
 	labelInfo := &widget.Label{Text: "Adding to category:", Alignment: fyne.TextAlignCenter}
 	imageContainer := container.NewVBox(animeImageHolder, labelInfo, selectCategory, layout.NewSpacer())
@@ -61,6 +63,7 @@ func setDialogAddAnime() {
 	inputSearch.SetPlaceHolder("Search")
 	inputSearch.OnSubmitted = func(s string) {
 		isAnimeSelected.Set(false)
+		selectedAnime = nil
 		listAnimeDisplay.UnselectAll()
 		if s == "" {
 			return
@@ -88,6 +91,19 @@ func setDialogAddAnime() {
 	dialogAdd := dialog.NewCustomWithoutButtons("Add new anime from Anilist", container.NewBorder(searchBar, nil, nil, imageContainer, listContainer), window)
 
 	addButton := &widget.Button{Text: "Add", OnTapped: dialogAdd.Hide, Icon: theme.ConfirmIcon(), Importance: widget.HighImportance}
+	addButton.OnTapped = func() {
+		if selectedAnime == nil {
+			return
+		}
+		err := anilist.UpdateAnimeStatus(user.Token, selectedAnime.ID, displayToCategories[selectCategory.Selected])
+		if err != nil {
+			log.Error("Error updating anime status:", err)
+			return
+		}
+		log.Info("Anime added successfully")
+		dialogAdd.Hide()
+	}
+
 	dialogAdd.SetButtons([]fyne.CanvasObject{
 		&widget.Button{Text: "Cancel", OnTapped: dialogAdd.Hide, Icon: theme.CancelIcon()},
 		addButton,
@@ -98,10 +114,8 @@ func setDialogAddAnime() {
 
 		imageLink := searchResult[id].CoverImage.Large
 		isAnimeSelected.Set(true)
-		/*err := anilist.UpdateAnimeStatus(user.Token, searchResult[id].ID, "DROPPED")
-		if err != nil {
-			return
-		}*/
+		selectedAnime = &searchResult[id]
+
 		if imageLink != nil {
 			imageFile := GetImageFromUrl(*imageLink)
 			if imageFile == nil {

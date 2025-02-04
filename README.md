@@ -1,8 +1,8 @@
-<h1> AnimeGUI  <img src="https://img.shields.io/badge/Go-2e1c3b?style=for-the-badge&logo=go"> </h1>
 
 <div align="center">
-<h3> Anime watching native cross-platform app made in Golang </h3>
-<img src="https://github.com/user-attachments/assets/639dd363-8d79-4ddf-816a-380774deba4f" width="900">
+<h1> AnimeGUI  <img src="https://img.shields.io/badge/Go-2e1c3b?style=for-the-badge&logo=go"> </h1>
+<h3> Cross-platform Anime watching native app made in Go 📺🌸</h3>
+<img src="https://github.com/user-attachments/assets/703e7cae-c2b8-4cb9-8d70-823d924b1a8f" width="900">
 </div>
 <br>
 
