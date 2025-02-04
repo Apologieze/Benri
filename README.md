@@ -1,6 +1,6 @@
 
 <div align="center">
-<h1> AnimeGUI  <img src="https://img.shields.io/badge/Go-2e1c3b?style=for-the-badge&logo=go"> </h1>
+<h1> AnimeGUI  <img src="https://img.shields.io/badge/Go-CEBB5B?style=for-the-badge&logo=go&logoColor=white"> </h1>
 <h3> Cross-platform Anime watching native app made in Go 📺🌸</h3>
 <img src="https://github.com/user-attachments/assets/eb5161a2-0e1e-446d-93af-d659636b9cde" width="850">
 </div>
