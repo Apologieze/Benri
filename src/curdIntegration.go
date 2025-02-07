@@ -289,7 +289,7 @@ func displayLocalProgress() {
 		if localDbAnime.Ep.Number == *animeSelected.Progress && localDbAnime.Ep.Player.PlaybackTime == 0 {
 			episodeLastPlayback.SetText(fmt.Sprintf("Just finished Episode %d", localDbAnime.Ep.Number))
 		} else {
-			episodeLastPlayback.SetText(fmt.Sprintf("Last saved at Episode %d: [%s]", localDbAnime.Ep.Number+1, time.Second*time.Duration(localDbAnime.Ep.Player.PlaybackTime)))
+			episodeLastPlayback.SetText(fmt.Sprintf("Last saved at EP%d: [%s]", localDbAnime.Ep.Number+1, time.Second*time.Duration(localDbAnime.Ep.Player.PlaybackTime)))
 		}
 	} else {
 		episodeLastPlayback.Hide()

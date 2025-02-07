@@ -6,16 +6,19 @@ toolchain go1.23.4
 
 require (
 	fyne.io/fyne/v2 v2.5.3
+	github.com/Microsoft/go-winio v0.6.2
 	github.com/bep/debounce v1.2.1
+	github.com/charmbracelet/bubbletea v1.1.1
 	github.com/charmbracelet/log v0.4.0
+	github.com/dweymouth/fyne-tooltip v0.2.1
+	github.com/gen2brain/beeep v0.0.0-20240516210008-9c006672e7f4
+	github.com/hugolgst/rich-go v0.0.0-20240715122152-74618cc1ace2
 )
 
 require (
 	fyne.io/systray v1.11.0 // indirect
 	github.com/BurntSushi/toml v1.4.0 // indirect
-	github.com/Microsoft/go-winio v0.6.2 // indirect
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
-	github.com/charmbracelet/bubbletea v1.1.1 // indirect
 	github.com/charmbracelet/lipgloss v0.13.0 // indirect
 	github.com/charmbracelet/x/ansi v0.2.3 // indirect
 	github.com/charmbracelet/x/term v0.2.0 // indirect
@@ -26,7 +29,6 @@ require (
 	github.com/fyne-io/gl-js v0.0.0-20220119005834-d2da28d9ccfe // indirect
 	github.com/fyne-io/glfw-js v0.0.0-20241126112943-313d8a0fe1d0 // indirect
 	github.com/fyne-io/image v0.0.0-20220602074514-4956b0afb3d2 // indirect
-	github.com/gen2brain/beeep v0.0.0-20240516210008-9c006672e7f4 // indirect
 	github.com/go-gl/gl v0.0.0-20211210172815-726fda9656d6 // indirect
 	github.com/go-gl/glfw/v3.3/glfw v0.0.0-20240506104042-037f3cc74f2a // indirect
 	github.com/go-logfmt/logfmt v0.6.0 // indirect
@@ -35,7 +37,6 @@ require (
 	github.com/go-toast/toast v0.0.0-20190211030409-01e6764cf0a4 // indirect
 	github.com/godbus/dbus/v5 v5.1.0 // indirect
 	github.com/gopherjs/gopherjs v1.17.2 // indirect
-	github.com/hugolgst/rich-go v0.0.0-20240715122152-74618cc1ace2 // indirect
 	github.com/jeandeaual/go-locale v0.0.0-20240223122105-ce5225dcaa49 // indirect
 	github.com/jsummers/gobmp v0.0.0-20151104160322-e2ba15ffa76e // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect

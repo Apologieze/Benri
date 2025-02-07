@@ -16,6 +16,8 @@ import (
 	"fyne.io/fyne/v2/widget"
 	"github.com/bep/debounce"
 	"github.com/charmbracelet/log"
+	fynetooltip "github.com/dweymouth/fyne-tooltip"
+	ttwidget "github.com/dweymouth/fyne-tooltip/widget"
 	"image"
 	"image/color"
 	"io"
@@ -240,7 +242,7 @@ func initMainApp() {
 
 	imageEx := &canvas.Image{}
 
-	animeName := widget.NewLabelWithStyle("", fyne.TextAlignCenter, fyne.TextStyle{Bold: true})
+	animeName := ttwidget.NewLabelWithStyle("", fyne.TextAlignCenter, fyne.TextStyle{Bold: true})
 	animeName.Wrapping = fyne.TextWrapWord
 
 	episodeMinus := widget.NewButton(" - ", func() { changeEpisodeInApp(-1) })
@@ -273,6 +275,7 @@ func initMainApp() {
 		animeSelected = &(*animeList)[id]
 		if err == nil {
 			animeName.SetText(listName)
+			animeName.SetToolTip(anilist.AnimeToRomaji(animeSelected.Media))
 		}
 
 		if animeSelected.Media.NextAiringEpisode != nil {
@@ -302,5 +305,5 @@ func initMainApp() {
 		imageContainer.Refresh()
 	}
 
-	window.SetContent(container.NewBorder(nil, nil, nil, imageContainer, leftSide))
+	window.SetContent(fynetooltip.AddWindowToolTipLayer(container.NewBorder(nil, nil, nil, imageContainer, leftSide), window.Canvas()))
 }

@@ -2,7 +2,6 @@ package anilist
 
 import (
 	"AnimeGUI/verniy"
-	verniy2 "AnimeGUI/verniy"
 	"fmt"
 	"fyne.io/fyne/v2/widget"
 	"github.com/charmbracelet/log"
@@ -10,35 +9,35 @@ import (
 	"strings"
 )
 
-var fields = []verniy2.MediaListGroupField{
-	verniy2.MediaListGroupFieldName,
-	verniy2.MediaListGroupFieldEntries(
-		verniy2.MediaListFieldID,
-		verniy2.MediaListFieldStatus,
-		verniy2.MediaListFieldScore,
-		verniy2.MediaListFieldProgress,
-		verniy2.MediaListFieldMedia(
-			verniy2.MediaFieldID,
-			verniy2.MediaFieldNextAiringEpisode(
-				verniy2.AiringScheduleFieldEpisode,
-				verniy2.AiringScheduleFieldAiringAt,
-				verniy2.AiringScheduleFieldTimeUntilAiring,
+var fields = []verniy.MediaListGroupField{
+	verniy.MediaListGroupFieldName,
+	verniy.MediaListGroupFieldEntries(
+		verniy.MediaListFieldID,
+		verniy.MediaListFieldStatus,
+		verniy.MediaListFieldScore,
+		verniy.MediaListFieldProgress,
+		verniy.MediaListFieldMedia(
+			verniy.MediaFieldID,
+			verniy.MediaFieldNextAiringEpisode(
+				verniy.AiringScheduleFieldEpisode,
+				verniy.AiringScheduleFieldAiringAt,
+				verniy.AiringScheduleFieldTimeUntilAiring,
 			),
-			verniy2.MediaFieldTitle(
-				verniy2.MediaTitleFieldRomaji,
-				verniy2.MediaTitleFieldEnglish,
-				verniy2.MediaTitleFieldNative),
-			verniy2.MediaFieldType,
-			verniy2.MediaFieldFormat,
-			verniy2.MediaFieldStatusV2,
-			verniy2.MediaFieldCoverImage(verniy2.MediaCoverImageFieldLarge, verniy2.MediaCoverImageFieldExtraLarge),
-			verniy2.MediaFieldAverageScore,
-			verniy2.MediaFieldPopularity,
-			verniy2.MediaFieldIsAdult,
-			verniy2.MediaFieldEpisodes)),
+			verniy.MediaFieldTitle(
+				verniy.MediaTitleFieldRomaji,
+				verniy.MediaTitleFieldEnglish,
+				verniy.MediaTitleFieldNative),
+			verniy.MediaFieldType,
+			verniy.MediaFieldFormat,
+			verniy.MediaFieldStatusV2,
+			verniy.MediaFieldCoverImage(verniy.MediaCoverImageFieldLarge, verniy.MediaCoverImageFieldExtraLarge),
+			verniy.MediaFieldAverageScore,
+			verniy.MediaFieldPopularity,
+			verniy.MediaFieldIsAdult,
+			verniy.MediaFieldEpisodes)),
 }
 
-var UserData []verniy2.MediaListGroup
+var UserData []verniy.MediaListGroup
 
 var categoriesToInt = make(map[string]int)
 
@@ -49,12 +48,12 @@ var categoriesToInt = make(map[string]int)
 	"Planning":  3,
 }*/
 
-var Client *verniy2.Client = verniy2.New()
+var Client *verniy.Client = verniy.New()
 
 func GetData(radio *widget.RadioGroup, username string, delete func()) {
 	typeAnime, err := Client.GetUserAnimeListSort(username, verniy.MediaListSortUpdatedTimeDesc, fields...)
 	if err != nil {
-		typeAnime = make([]verniy2.MediaListGroup, 4)
+		typeAnime = make([]verniy.MediaListGroup, 4)
 		log.Error("Invalid token")
 		log.Error(err)
 		delete()
@@ -76,7 +75,7 @@ func GetData(radio *widget.RadioGroup, username string, delete func()) {
 	}
 }
 
-func FindList(categoryName string) *[]verniy2.MediaList {
+func FindList(categoryName string) *[]verniy.MediaList {
 	if UserData == nil {
 		log.Error("No data found")
 		return nil
@@ -84,12 +83,12 @@ func FindList(categoryName string) *[]verniy2.MediaList {
 	categoryIndex, exists := categoriesToInt[categoryName]
 	if !exists {
 		log.Error("Category not found in user")
-		return &[]verniy2.MediaList{}
+		return &[]verniy.MediaList{}
 	}
 	return &UserData[categoryIndex].Entries
 }
 
-func AnimeToName(anime *verniy2.Media) *string {
+func AnimeToName(anime *verniy.Media) *string {
 	if anime == nil {
 		return nil
 	}
@@ -100,6 +99,19 @@ func AnimeToName(anime *verniy2.Media) *string {
 		return anime.Title.English
 	}
 	return anime.Title.Romaji
+}
+
+func AnimeToRomaji(anime *verniy.Media) string {
+	if anime == nil {
+		return ""
+	}
+	if anime.Title == nil {
+		return ""
+	}
+	if anime.Title.Romaji != nil {
+		return *anime.Title.Romaji
+	}
+	return ""
 }
 
 func FormatDuration(seconds int) string {
@@ -133,7 +145,7 @@ func IdToUrl(id int) *url.URL {
 	return u
 }
 
-func SearchFromQuery(strQuery string) []verniy2.Media {
+func SearchFromQuery(strQuery string) []verniy.Media {
 	if strQuery == "" {
 		return nil
 	}
