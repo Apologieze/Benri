@@ -5,8 +5,7 @@ import (
 	"crypto/rand"
 	"encoding/json"
 	"fmt"
-	"github.com/Microsoft/go-winio"
-	"net"
+	"github.com/charmbracelet/log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -32,7 +31,7 @@ func StartVideo(link string, args []string, title string) (string, error) {
 	randomBytes := make([]byte, 4)
 	_, err := rand.Read(randomBytes)
 	if err != nil {
-		Log("Failed to generate random number", logFile)
+		log.Error("Failed to generate random number")
 		return "", fmt.Errorf("failed to generate random number: %w", err)
 	}
 
@@ -63,7 +62,7 @@ func StartVideo(link string, args []string, title string) (string, error) {
 		mpvPath, err := getMPVPath()
 		if err != nil {
 			CurdOut("Error: Failed to get MPV path")
-			Log("Failed to get mpv path.", logFile)
+			log.Error("Failed to get mpv path.")
 			return "", err
 		}
 
@@ -96,15 +95,7 @@ func joinArgs(args []string) string {
 }
 
 func MPVSendCommand(ipcSocketPath string, command []interface{}) (interface{}, error) {
-	var conn net.Conn
-	var err error
-
-	if runtime.GOOS == "windows" {
-		// Use named pipe for Windows
-		conn, err = winio.DialPipe(ipcSocketPath, nil)
-	} else {
-		conn, err = net.Dial("unix", ipcSocketPath)
-	}
+	conn, err := connectToPipe(ipcSocketPath)
 	if err != nil {
 		return nil, err
 	}
@@ -163,7 +154,7 @@ func GetMPVPausedStatus(ipcSocketPath string) (bool, error) {
 func GetMPVPlaybackSpeed(ipcSocketPath string) (float64, error) {
 	speed, err := MPVSendCommand(ipcSocketPath, []interface{}{"get_property", "speed"})
 	if err != nil || speed == nil {
-		Log("Failed to get playback speed.", logFile)
+		log.Error("Failed to get playback speed.", logFile)
 		return 0, err
 	}
 

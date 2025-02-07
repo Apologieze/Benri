@@ -3,6 +3,7 @@ package curdInteg
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/charmbracelet/log"
 	"io"
 	"net/http"
 	"net/url"
@@ -87,7 +88,7 @@ func SearchAnime(query, mode string) (map[string]string, error) {
 	// Marshal the variables to JSON
 	variablesJSON, err := json.Marshal(variables)
 	if err != nil {
-		Log(fmt.Sprintf("Error encoding variables to JSON: %v", err), logFile)
+		log.Error(fmt.Sprintf("Error encoding variables to JSON: %v", err))
 		return animeList, err
 	}
 
@@ -97,7 +98,7 @@ func SearchAnime(query, mode string) (map[string]string, error) {
 	// Make the HTTP request
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		Log(fmt.Sprintf("Error creating HTTP request: %v", err), logFile)
+		log.Error(fmt.Sprintf("Error creating HTTP request: %v", err))
 		return animeList, err
 	}
 	req.Header.Set("User-Agent", agent)
@@ -106,7 +107,7 @@ func SearchAnime(query, mode string) (map[string]string, error) {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		Log(fmt.Sprintf("Error making HTTP request: %v", err), logFile)
+		log.Error(fmt.Sprintf("Error making HTTP request: %v", err))
 		return animeList, err
 	}
 	defer resp.Body.Close()
@@ -114,19 +115,19 @@ func SearchAnime(query, mode string) (map[string]string, error) {
 	// Read the response body
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		Log(fmt.Sprintf("Error reading response body: %v", err), logFile)
+		log.Error(fmt.Sprintf("Error reading response body: %v", err))
 		return animeList, err
 	}
 
 	// Debug: Log the response status and first part of the body
-	Log(fmt.Sprintf("Response Status: %s", resp.Status), logFile)
-	Log(fmt.Sprintf("Response Body (first 500 chars): %s", string(body[:min(len(body), 500)])), logFile)
+	log.Info(fmt.Sprintf("Response Status: %s", resp.Status), logFile)
+	log.Info(fmt.Sprintf("Response Body (first 500 chars): %s", string(body[:min(len(body), 500)])), logFile)
 
 	// Parse the JSON response
 	var response response
 	err = json.Unmarshal(body, &response)
 	if err != nil {
-		Log(fmt.Sprintf("Error parsing JSON for query '%s': %v\nBody: %s", query, err, string(body)), logFile)
+		log.Error(fmt.Sprintf("Error parsing JSON for query '%s': %v\nBody: %s", query, err, string(body)), logFile)
 		return animeList, err
 	}
 
@@ -136,7 +137,7 @@ func SearchAnime(query, mode string) (map[string]string, error) {
 			if subEpisodes, ok := episodes["sub"].(float64); ok {
 				episodesStr = fmt.Sprintf("%d", int(subEpisodes))
 			} else {
-				Log(subEpisodes, logFile)
+				log.Error(subEpisodes)
 				episodesStr = "Unknown"
 			}
 		}

@@ -2,9 +2,9 @@ package main
 
 import (
 	curd "AnimeGUI/curdInteg"
+	"AnimeGUI/verniy"
 	"fmt"
 	"github.com/charmbracelet/log"
-	"github.com/rl404/verniy"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -138,7 +138,11 @@ func OnPlayButtonClick(animeName string, animeData *verniy.MediaList) {
 		return
 	}
 	finalLink := curd.PrioritizeLink(url)
-	fmt.Println(finalLink)
+	if len(finalLink) < 5 {
+		log.Error("No valid link found")
+		return
+	}
+	fmt.Println("Final Link:", finalLink)
 
 	mpvSocketPath, err := curd.StartVideo(finalLink, []string{}, fmt.Sprintf("%s - Episode %d", animeName, animeProgress))
 	if err != nil {
@@ -222,7 +226,6 @@ func playingAnimeLoop(playingAnime curd.Anime, animeData *verniy.MediaList) {
 				}
 			}
 		}
-		log.Info("YIPIIIIIII", playingAnime.Ep.Duration)
 
 		for {
 			time.Sleep(1 * time.Second)
@@ -286,7 +289,7 @@ func displayLocalProgress() {
 		if localDbAnime.Ep.Number == *animeSelected.Progress && localDbAnime.Ep.Player.PlaybackTime == 0 {
 			episodeLastPlayback.SetText(fmt.Sprintf("Just finished Episode %d", localDbAnime.Ep.Number))
 		} else {
-			episodeLastPlayback.SetText(fmt.Sprintf("Last saved at Episode %d: %s", localDbAnime.Ep.Number+1, time.Second*time.Duration(localDbAnime.Ep.Player.PlaybackTime)))
+			episodeLastPlayback.SetText(fmt.Sprintf("Last saved at Episode %d: [%s]", localDbAnime.Ep.Number+1, time.Second*time.Duration(localDbAnime.Ep.Player.PlaybackTime)))
 		}
 	} else {
 		episodeLastPlayback.Hide()

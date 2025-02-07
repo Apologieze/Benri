@@ -187,6 +187,7 @@ func LocalUpdateAnime(databaseFile string, anilistID int, allanimeID string, wat
 			animeList[i].Title.English = animeName
 			animeList[i].Title.Romaji = animeName
 			updated = true
+			animeList = moveToEnd(animeList, i)
 			break
 		}
 	}
@@ -236,6 +237,19 @@ func LocalUpdateAnime(databaseFile string, anilistID int, allanimeID string, wat
 	}
 
 	return nil, animeList
+}
+
+func moveToEnd(slice []Anime, n int) []Anime {
+	if n < 0 || n >= len(slice) {
+		return slice
+	}
+
+	value := slice[n]
+	// Shift elements back
+	copy(slice[n:], slice[n+1:])
+	slice[len(slice)-1] = value
+
+	return slice
 }
 
 // Function to find an anime by either Anilist ID or Allanime ID

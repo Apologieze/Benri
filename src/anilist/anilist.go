@@ -1,43 +1,44 @@
 package anilist
 
 import (
+	"AnimeGUI/verniy"
+	verniy2 "AnimeGUI/verniy"
 	"fmt"
 	"fyne.io/fyne/v2/widget"
 	"github.com/charmbracelet/log"
-	"github.com/rl404/verniy"
 	"net/url"
 	"strings"
 )
 
-var fields = []verniy.MediaListGroupField{
-	verniy.MediaListGroupFieldName,
-	verniy.MediaListGroupFieldEntries(
-		verniy.MediaListFieldID,
-		verniy.MediaListFieldStatus,
-		verniy.MediaListFieldScore,
-		verniy.MediaListFieldProgress,
-		verniy.MediaListFieldMedia(
-			verniy.MediaFieldID,
-			verniy.MediaFieldNextAiringEpisode(
-				verniy.AiringScheduleFieldEpisode,
-				verniy.AiringScheduleFieldAiringAt,
-				verniy.AiringScheduleFieldTimeUntilAiring,
+var fields = []verniy2.MediaListGroupField{
+	verniy2.MediaListGroupFieldName,
+	verniy2.MediaListGroupFieldEntries(
+		verniy2.MediaListFieldID,
+		verniy2.MediaListFieldStatus,
+		verniy2.MediaListFieldScore,
+		verniy2.MediaListFieldProgress,
+		verniy2.MediaListFieldMedia(
+			verniy2.MediaFieldID,
+			verniy2.MediaFieldNextAiringEpisode(
+				verniy2.AiringScheduleFieldEpisode,
+				verniy2.AiringScheduleFieldAiringAt,
+				verniy2.AiringScheduleFieldTimeUntilAiring,
 			),
-			verniy.MediaFieldTitle(
-				verniy.MediaTitleFieldRomaji,
-				verniy.MediaTitleFieldEnglish,
-				verniy.MediaTitleFieldNative),
-			verniy.MediaFieldType,
-			verniy.MediaFieldFormat,
-			verniy.MediaFieldStatusV2,
-			verniy.MediaFieldCoverImage(verniy.MediaCoverImageFieldLarge, verniy.MediaCoverImageFieldExtraLarge),
-			verniy.MediaFieldAverageScore,
-			verniy.MediaFieldPopularity,
-			verniy.MediaFieldIsAdult,
-			verniy.MediaFieldEpisodes)),
+			verniy2.MediaFieldTitle(
+				verniy2.MediaTitleFieldRomaji,
+				verniy2.MediaTitleFieldEnglish,
+				verniy2.MediaTitleFieldNative),
+			verniy2.MediaFieldType,
+			verniy2.MediaFieldFormat,
+			verniy2.MediaFieldStatusV2,
+			verniy2.MediaFieldCoverImage(verniy2.MediaCoverImageFieldLarge, verniy2.MediaCoverImageFieldExtraLarge),
+			verniy2.MediaFieldAverageScore,
+			verniy2.MediaFieldPopularity,
+			verniy2.MediaFieldIsAdult,
+			verniy2.MediaFieldEpisodes)),
 }
 
-var UserData []verniy.MediaListGroup
+var UserData []verniy2.MediaListGroup
 
 var categoriesToInt = make(map[string]int)
 
@@ -48,23 +49,26 @@ var categoriesToInt = make(map[string]int)
 	"Planning":  3,
 }*/
 
-var Client *verniy.Client = verniy.New()
+var Client *verniy2.Client = verniy2.New()
 
 func GetData(radio *widget.RadioGroup, username string, delete func()) {
-	typeAnime, err := Client.GetUserAnimeList(username, fields...)
+	typeAnime, err := Client.GetUserAnimeListSort(username, verniy.MediaListSortUpdatedTimeDesc, fields...)
 	if err != nil {
-		typeAnime = make([]verniy.MediaListGroup, 4)
+		typeAnime = make([]verniy2.MediaListGroup, 4)
 		log.Error("Invalid token")
+		log.Error(err)
 		delete()
 	}
-	UserData = typeAnime
+
 	categoriesToInt = make(map[string]int)
 	for i := 0; i < len(typeAnime); i++ {
 		if typeAnime[i].Name != nil {
 			categoriesToInt[*typeAnime[i].Name] = i
+			//typeAnime[i].Entries =
 		}
 	}
 
+	UserData = typeAnime
 	if radio != nil {
 		if radio.Selected == "" {
 			radio.SetSelected("Watching")
@@ -72,7 +76,7 @@ func GetData(radio *widget.RadioGroup, username string, delete func()) {
 	}
 }
 
-func FindList(categoryName string) *[]verniy.MediaList {
+func FindList(categoryName string) *[]verniy2.MediaList {
 	if UserData == nil {
 		log.Error("No data found")
 		return nil
@@ -80,12 +84,12 @@ func FindList(categoryName string) *[]verniy.MediaList {
 	categoryIndex, exists := categoriesToInt[categoryName]
 	if !exists {
 		log.Error("Category not found in user")
-		return &[]verniy.MediaList{}
+		return &[]verniy2.MediaList{}
 	}
 	return &UserData[categoryIndex].Entries
 }
 
-func AnimeToName(anime *verniy.Media) *string {
+func AnimeToName(anime *verniy2.Media) *string {
 	if anime == nil {
 		return nil
 	}
@@ -129,7 +133,7 @@ func IdToUrl(id int) *url.URL {
 	return u
 }
 
-func SearchFromQuery(strQuery string) []verniy.Media {
+func SearchFromQuery(strQuery string) []verniy2.Media {
 	if strQuery == "" {
 		return nil
 	}

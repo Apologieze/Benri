@@ -8,7 +8,6 @@ require (
 	fyne.io/fyne/v2 v2.5.3
 	github.com/bep/debounce v1.2.1
 	github.com/charmbracelet/log v0.4.0
-	github.com/rl404/verniy v0.3.1
 )
 
 require (

@@ -3,6 +3,7 @@ package main
 import (
 	curd "AnimeGUI/curdInteg"
 	"AnimeGUI/src/anilist"
+	"AnimeGUI/verniy"
 	"fmt"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
@@ -15,7 +16,6 @@ import (
 	"fyne.io/fyne/v2/widget"
 	"github.com/bep/debounce"
 	"github.com/charmbracelet/log"
-	"github.com/rl404/verniy"
 	"image"
 	"image/color"
 	"io"
@@ -164,7 +164,7 @@ func changeEpisodeInApp(variation int) {
 func initMainApp() {
 	secondCurdInit()
 	anilist.Client.AccessToken = user.Token
-	window.SetTitle("AnimeGUI")
+	window.SetTitle("Benri")
 	fmt.Println(localAnime)
 
 	debounced := debounce.New(400 * time.Millisecond)

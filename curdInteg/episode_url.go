@@ -3,6 +3,7 @@ package curdInteg
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/charmbracelet/log"
 	"io"
 	"net/http"
 	"net/url"
@@ -78,14 +79,14 @@ func extractLinks(provider_id string) map[string]interface{} {
 	// Read the response body
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		Log(fmt.Sprint("Error reading response:", err), logFile)
+		log.Error(fmt.Sprint("Error reading response:", err))
 		return videoData
 	}
 
 	// Parse the JSON response
 	err = json.Unmarshal(body, &videoData)
 	if err != nil {
-		Log(fmt.Sprint("Error parsing JSON:", err), logFile)
+		log.Error(fmt.Sprint("Error parsing JSON:", err))
 		return videoData
 	}
 
@@ -150,7 +151,7 @@ func GetEpisodeURL(config CurdConfig, id string, epNo int) ([]string, error) {
 	var response allanimeResponse
 	err = json.Unmarshal([]byte(responseStr), &response)
 	if err != nil {
-		Log(fmt.Sprint("Error parsing JSON: ", err), logFile)
+		log.Error(fmt.Sprint("Error parsing JSON: ", err))
 	}
 
 	var allinks []string // This will be returned
@@ -169,7 +170,7 @@ func GetEpisodeURL(config CurdConfig, id string, epNo int) ([]string, error) {
 					}
 				}
 			} else {
-				Log("Links field is not of the expected type []interface{}", logFile)
+				log.Error("Links field is not of the expected type []interface{}")
 			}
 		}
 	}
