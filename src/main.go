@@ -203,8 +203,6 @@ func initMainApp() {
 	radiobox.Horizontal = true
 
 	toolbar := widget.NewToolbar(
-		widget.NewToolbarAction(theme.ViewRefreshIcon(), func() {}),
-		widget.NewToolbarSeparator(),
 		widget.NewToolbarAction(theme.ContentAddIcon(), func() {
 			setDialogAddAnime()
 		}),
@@ -221,6 +219,10 @@ func initMainApp() {
 					log.Error("Can't open url", err)
 				}
 			}
+		}),
+		widget.NewToolbarSeparator(),
+		widget.NewToolbarAction(theme.MenuIcon(), func() {
+			openMenuOption()
 		}),
 	)
 
