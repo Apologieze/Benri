@@ -16,10 +16,10 @@
 ---
 
 <br>
-<a href="https://star-history.com/#Apologieze/AnimeGUI&Date">
+<a href="https://star-history.com/#Apologieze/Benri&Date">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=Apologieze/AnimeGUI&type=Date&theme=dark" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=Apologieze/AnimeGUI&type=Date" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=Apologieze/Benri&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=Apologieze/Benri&type=Date" />
    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=Apologieze/Benri&type=Date" />
  </picture>
 </a>
