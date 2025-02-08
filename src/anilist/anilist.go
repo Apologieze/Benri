@@ -78,7 +78,7 @@ func GetData(radio *widget.RadioGroup, username string, delete func()) {
 func FindList(categoryName string) *[]verniy.MediaList {
 	if UserData == nil {
 		log.Error("No data found")
-		return nil
+		return &[]verniy.MediaList{}
 	}
 	categoryIndex, exists := categoriesToInt[categoryName]
 	if !exists {
@@ -86,6 +86,30 @@ func FindList(categoryName string) *[]verniy.MediaList {
 		return &[]verniy.MediaList{}
 	}
 	return &UserData[categoryIndex].Entries
+}
+
+func FindListWithQuery(categoryName string, query string) *[]verniy.MediaList {
+	fullList := FindList(categoryName)
+	if fullList == nil {
+		return &[]verniy.MediaList{}
+	}
+	if len(*fullList) == 0 {
+		return &[]verniy.MediaList{}
+	}
+	tempMediaList := make([]verniy.MediaList, 0, 25)
+	for _, anime := range *fullList {
+		englishName := AnimeToName(anime.Media)
+		if englishName == nil {
+			continue
+		}
+		if strings.Contains(strings.ToLower(*englishName), strings.ToLower(query)) {
+			tempMediaList = append(tempMediaList, anime)
+		} else if strings.Contains(strings.ToLower(AnimeToRomaji(anime.Media)), strings.ToLower(query)) {
+			tempMediaList = append(tempMediaList, anime)
+		}
+	}
+
+	return &tempMediaList
 }
 
 func AnimeToName(anime *verniy.Media) *string {

@@ -47,6 +47,8 @@ func main() {
 	window = appW.NewWindow(AppName)
 	window.Resize(fyne.NewSize(1000, 700))
 	window.CenterOnScreen()
+
+	initMenuOption()
 	window.Show()
 
 	appW.Settings().SetTheme(&forcedVariant{
@@ -185,14 +187,13 @@ func initMainApp() {
 
 	input := widget.NewEntry()
 	input.SetPlaceHolder("Filter anime name")
-	input.OnChanged = func(s string) {
-		debounced(func() {
-			fmt.Println(s)
-		})
-	}
 
 	radiobox := widget.NewRadioGroup([]string{"Watching", "Planning", "Completed", "Dropped"}, func(s string) {
-		animeList = anilist.FindList(s)
+		if input.Text == "" {
+			animeList = anilist.FindList(s)
+		} else {
+			animeList = anilist.FindListWithQuery(s, input.Text)
+		}
 		if updateAnimeNames(data) {
 			listDisplay.Unselect(0)
 			listDisplay.Select(0)
@@ -201,6 +202,22 @@ func initMainApp() {
 	})
 	radiobox.Required = true
 	radiobox.Horizontal = true
+
+	input.OnChanged = func(s string) {
+		debounced(func() {
+			fmt.Println("Search:", s)
+			if s == "" {
+				animeList = anilist.FindList(radiobox.Selected)
+			} else {
+				animeList = anilist.FindListWithQuery(radiobox.Selected, s)
+			}
+			if updateAnimeNames(data) {
+				listDisplay.Unselect(0)
+				listDisplay.Select(0)
+				listDisplay.ScrollToTop()
+			}
+		})
+	}
 
 	toolbar := widget.NewToolbar(
 		widget.NewToolbarAction(theme.ContentAddIcon(), func() {
