@@ -2,6 +2,7 @@ package main
 
 import (
 	curd "AnimeGUI/curdInteg"
+	"AnimeGUI/src/anilist"
 	"AnimeGUI/verniy"
 	"fmt"
 	"github.com/charmbracelet/log"
@@ -110,7 +111,7 @@ func OnPlayButtonClick(animeName string, animeData *verniy.MediaList) {
 	}
 	animePointer := SearchFromLocalAniId(animeData.Media.ID)
 	if animePointer == nil {
-		allAnimeId = searchAllAnimeData(animeName, animeData.Media.Episodes, animeProgress)
+		allAnimeId = searchAllAnimeData(anilist.AnimeToRomaji(animeData.Media), animeData.Media.Episodes, animeProgress)
 		if allAnimeId == "" {
 			log.Error("Failed to get allAnimeId")
 			return
@@ -165,7 +166,9 @@ func OnPlayButtonClick(animeName string, animeData *verniy.MediaList) {
 }
 
 func searchAllAnimeData(animeName string, epNumber *int, animeProgress int) string {
+	fmt.Println(animeName)
 	searchAnimeResult, err := curd.SearchAnime(animeName, "sub")
+	fmt.Println(searchAnimeResult)
 	if err != nil {
 		log.Error(err)
 	}
