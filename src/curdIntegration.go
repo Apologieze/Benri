@@ -133,11 +133,13 @@ func OnPlayButtonClick(animeName string, animeData *verniy.MediaList) {
 
 	log.Info("Anime Progress:", animeProgress)
 
+	fmt.Println("Start getting url")
 	url, err := curd.GetEpisodeURL(userCurdConfig, allAnimeId, animeProgress)
 	if err != nil {
 		log.Error(err)
 		return
 	}
+	fmt.Println("--Got all urls")
 	finalLink := curd.PrioritizeLink(url)
 	if len(finalLink) < 5 {
 		log.Error("No valid link found")

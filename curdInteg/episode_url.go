@@ -1,6 +1,7 @@
 package curdInteg
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/charmbracelet/log"
@@ -9,6 +10,8 @@ import (
 	"net/url"
 	"regexp"
 	"strings"
+	"sync"
+	"time"
 	"unicode"
 )
 
@@ -145,35 +148,84 @@ func GetEpisodeURL(config CurdConfig, id string, epNo int) ([]string, error) {
 		return nil, err
 	}
 
-	responseStr := string(body)
-
-	// Unmarshal the JSON data into the struct
 	var response allanimeResponse
-	err = json.Unmarshal([]byte(responseStr), &response)
-	if err != nil {
-		log.Error(fmt.Sprint("Error parsing JSON: ", err))
+	if err := json.Unmarshal(body, &response); err != nil {
+		return nil, fmt.Errorf("error parsing JSON: %v", err)
 	}
 
-	var allinks []string // This will be returned
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
-	// Iterate through the SourceUrls and print each URL
+	var (
+		mu      sync.Mutex
+		found   bool
+		allinks []string
+	)
+
+	var wg sync.WaitGroup
+	resultChan := make(chan []string, 1) // Buffer for immediate return
+
 	for _, url := range response.Data.Episode.SourceUrls {
-		if len(url.SourceUrl) > 2 && unicode.IsDigit(rune(url.SourceUrl[2])) { // Source Url 3rd letter is a number (it stars as --32f23k31jk)
-			decodedProviderID := decodeProviderID(url.SourceUrl[2:]) // Decode the source url to get the provider id
-			extractedLinks := extractLinks(decodedProviderID)        // Extract the links using provider id
-			if linksInterface, ok := extractedLinks["links"].([]interface{}); ok {
-				for _, linkInterface := range linksInterface {
-					if linkMap, ok := linkInterface.(map[string]interface{}); ok {
-						if link, ok := linkMap["link"].(string); ok {
-							allinks = append(allinks, link) // Add all extracted links into allinks
+		if len(url.SourceUrl) > 2 && unicode.IsDigit(rune(url.SourceUrl[2])) {
+			decodedProviderID := decodeProviderID(url.SourceUrl[2:])
+
+			wg.Add(1)
+			go func(id string) {
+				defer wg.Done()
+
+				// Early exit if context cancelled
+				select {
+				case <-ctx.Done():
+					return
+				default:
+				}
+
+				extractedLinks := extractLinks(id)
+
+				// Check links for sharepoint
+				if links, ok := extractedLinks["links"].([]interface{}); ok {
+					for _, linkInterface := range links {
+						if linkMap, ok := linkInterface.(map[string]interface{}); ok {
+							if link, ok := linkMap["link"].(string); ok {
+								fmt.Println(link)
+								if strings.Contains(link, LinkPriorities[0]) {
+									fmt.Println("found")
+									mu.Lock()
+									if !found {
+										found = true
+										resultChan <- []string{link} // Immediate result
+										cancel()                     // Cancel all other operations
+									}
+									mu.Unlock()
+									return
+								}
+
+								// Add normal link if no sharepoint found
+								mu.Lock()
+								allinks = append(allinks, link)
+								mu.Unlock()
+							}
 						}
 					}
 				}
-			} else {
-				log.Error("Links field is not of the expected type []interface{}")
-			}
+			}(decodedProviderID)
 		}
 	}
 
-	return allinks, nil
+	// Wait for either the first sharepoint link or all goroutines
+	go func() {
+		wg.Wait()
+		mu.Lock()
+		defer mu.Unlock()
+		if !found {
+			resultChan <- allinks // Send final results
+		}
+	}()
+
+	select {
+	case result := <-resultChan:
+		return result, nil
+	case <-time.After(10 * time.Second): // Safety timeout
+		return nil, fmt.Errorf("timeout waiting for results")
+	}
 }

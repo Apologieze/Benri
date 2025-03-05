@@ -65,7 +65,7 @@ func main() {
 	}
 }
 
-func updateAnimeNames(data binding.ExternalStringList) (first bool) {
+func updateAnimeNames(data *binding.ExternalStringList) (first bool) {
 	if animeList == nil {
 		log.Error("No list found")
 		return
@@ -81,7 +81,7 @@ func updateAnimeNames(data binding.ExternalStringList) (first bool) {
 	if len(tempName) != 0 {
 		first = true
 	}
-	err := data.Set(tempName)
+	err := (*data).Set(tempName)
 	if err != nil {
 		return
 	}
@@ -194,7 +194,7 @@ func initMainApp() {
 		} else {
 			animeList = anilist.FindListWithQuery(s, input.Text)
 		}
-		if updateAnimeNames(data) {
+		if updateAnimeNames(&data) {
 			listDisplay.Unselect(0)
 			listDisplay.Select(0)
 			listDisplay.ScrollToTop()
@@ -211,7 +211,7 @@ func initMainApp() {
 			} else {
 				animeList = anilist.FindListWithQuery(radiobox.Selected, s)
 			}
-			if updateAnimeNames(data) {
+			if updateAnimeNames(&data) {
 				listDisplay.Unselect(0)
 				listDisplay.Select(0)
 				listDisplay.ScrollToTop()

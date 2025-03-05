@@ -3,4 +3,4 @@ version: '3'
 tasks:
   package-w:
     cmds:
-      - fyne package --sourceDir ./src/ -os windows -icon ../asset/icon.jpg -name AnimeGUI
+      - fyne package --sourceDir ./src/ -os windows -icon ../asset/icon.jpg -name Benri
