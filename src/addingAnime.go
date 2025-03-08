@@ -24,6 +24,14 @@ var displayToCategories = map[string]string{
 	"Plan to Watch": "PLANNING",
 }
 
+var categoriesToDisplay = map[string]string{
+	"CURRENT":   "Watching",
+	"COMPLETED": "Completed",
+	"PAUSED":    "Paused",
+	"DROPPED":   "Dropped",
+	"PLANNING":  "Plan to Watch",
+}
+
 var displayCategories = []string{
 	"Watching",
 	"Plan to Watch",
@@ -32,16 +40,17 @@ var displayCategories = []string{
 	"Dropped",
 }
 
-func setDialogAddAnime() {
+func setDialogAddAnime(radiobox *widget.RadioGroup) {
 	var searchResult []verniy.Media
 	var selectedAnime *verniy.Media
+	var selectedAnimeStatus string
 	isAnimeSelected := binding.NewBool()
 
 	animeImageHolder := &canvas.Image{}
 	selectCategory := widget.NewSelect(displayCategories, func(s string) {})
 	selectCategory.Alignment = fyne.TextAlignCenter
 	selectCategory.SetSelected(displayCategories[0])
-	labelInfo := &widget.Label{Text: "Adding to category:", Alignment: fyne.TextAlignCenter}
+	labelInfo := &widget.Label{Text: "Change to category:", Alignment: fyne.TextAlignCenter}
 	imageContainer := container.NewVBox(animeImageHolder, labelInfo, selectCategory, layout.NewSpacer())
 	//imageContainer.Hide()
 
@@ -91,6 +100,7 @@ func setDialogAddAnime() {
 	dialogAdd := dialog.NewCustomWithoutButtons("Add new anime from Anilist", container.NewBorder(searchBar, nil, nil, imageContainer, listContainer), window)
 
 	addButton := &widget.Button{Text: "Add", OnTapped: dialogAdd.Hide, Icon: theme.ConfirmIcon(), Importance: widget.HighImportance}
+
 	addButton.OnTapped = func() {
 		if selectedAnime == nil {
 			return
@@ -101,7 +111,18 @@ func setDialogAddAnime() {
 			return
 		}
 		log.Info("Anime added successfully")
+		go anilist.GetData(radiobox, user.Username, func() { log.Error("Invalid token") })
 		dialogAdd.Hide()
+	}
+
+	selectCategory.OnChanged = func(s string) {
+		if status, ok := displayToCategories[s]; ok {
+			if status == selectedAnimeStatus {
+				addButton.Disable()
+				return
+			}
+		}
+		addButton.Enable()
 	}
 
 	dialogAdd.SetButtons([]fyne.CanvasObject{
@@ -127,6 +148,16 @@ func setDialogAddAnime() {
 			imageContainer.Refresh()
 		}
 
+		status := anilist.FindStatusFromId(selectedAnime.ID)
+		if status != nil {
+			selectedAnimeStatus = string(*status)
+			if display, ok := categoriesToDisplay[selectedAnimeStatus]; ok {
+				selectCategory.SetSelected(display)
+			}
+		} else {
+			selectedAnimeStatus = ""
+			selectCategory.SetSelected(displayCategories[0])
+		}
 	}
 
 	isAnimeSelected.AddListener(binding.NewDataListener(func() {

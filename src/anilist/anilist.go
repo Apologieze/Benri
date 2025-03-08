@@ -13,6 +13,7 @@ var fields = []verniy.MediaListGroupField{
 	verniy.MediaListGroupFieldName,
 	verniy.MediaListGroupFieldEntries(
 		verniy.MediaListFieldID,
+		verniy.MediaListFieldMediaID,
 		verniy.MediaListFieldStatus,
 		verniy.MediaListFieldScore,
 		verniy.MediaListFieldProgress,
@@ -71,6 +72,8 @@ func GetData(radio *widget.RadioGroup, username string, delete func()) {
 	if radio != nil {
 		if radio.Selected == "" {
 			radio.SetSelected("Watching")
+		} else {
+			radio.OnChanged(radio.Selected)
 		}
 	}
 }
@@ -180,4 +183,20 @@ func SearchFromQuery(strQuery string) []verniy.Media {
 		return nil
 	}
 	return result.Media
+}
+
+func FindStatusFromId(targetId int) *verniy.MediaListStatus {
+	for i := range UserData {
+		group := &UserData[i]
+
+		for j := range group.Entries {
+			mediaList := &group.Entries[j]
+
+			if mediaList.MediaID == targetId {
+				return mediaList.Status
+			}
+		}
+	}
+
+	return nil
 }

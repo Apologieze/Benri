@@ -33,6 +33,7 @@ var (
 	appW                fyne.App
 	episodeNumber       = widget.NewLabelWithStyle("", fyne.TextAlignCenter, fyne.TextStyle{Bold: true})
 	episodeLastPlayback = widget.NewLabelWithStyle("", fyne.TextAlignCenter, fyne.TextStyle{})
+	playButton          *widget.Button
 	changedToken        bool
 	mpvPresent          bool
 	grayScaleList       uint8 = 35
@@ -221,7 +222,7 @@ func initMainApp() {
 
 	toolbar := widget.NewToolbar(
 		widget.NewToolbarAction(theme.ContentAddIcon(), func() {
-			setDialogAddAnime()
+			setDialogAddAnime(radiobox)
 		}),
 		widget.NewToolbarSeparator(),
 		widget.NewToolbarAction(theme.MailAttachmentIcon(), func() {
@@ -238,7 +239,7 @@ func initMainApp() {
 			}
 		}),
 		widget.NewToolbarSeparator(),
-		widget.NewToolbarAction(theme.MenuIcon(), func() {
+		widget.NewToolbarAction(theme.SettingsIcon(), func() {
 			openMenuOption()
 		}),
 	)
@@ -264,8 +265,8 @@ func initMainApp() {
 	animeName := ttwidget.NewLabelWithStyle("", fyne.TextAlignCenter, fyne.TextStyle{Bold: true})
 	animeName.Wrapping = fyne.TextWrapWord
 
-	episodeMinus := widget.NewButton(" - ", func() { changeEpisodeInApp(-1) })
-	episodePlus := widget.NewButton(" + ", func() { changeEpisodeInApp(1) })
+	episodeMinus := widget.NewButtonWithIcon("", theme.ContentRemoveIcon(), func() { changeEpisodeInApp(-1) })
+	episodePlus := widget.NewButtonWithIcon("", theme.ContentAddIcon(), func() { changeEpisodeInApp(1) })
 
 	episodeContainer := container.NewHBox(layout.NewSpacer(), episodeMinus, episodeNumber, episodePlus, layout.NewSpacer())
 
@@ -273,7 +274,7 @@ func initMainApp() {
 	nextEpisodeLabel := &canvas.Text{Text: "", Color: color.RGBA{156, 190, 93, 255}, Alignment: fyne.TextAlignCenter, TextStyle: fyne.TextStyle{Bold: true}, TextSize: theme.TextSize()}
 	nextEpisodeLabel.Hide()
 
-	button := widget.NewButtonWithIcon("Play!", theme.MediaPlayIcon(), func() {
+	playButton = widget.NewButtonWithIcon("Play Ep1", theme.MediaPlayIcon(), func() {
 		//fmt.Println(anilist.Search())
 		fmt.Println(animeSelected.Media.ID)
 		if animeName.Text == "" {
@@ -282,10 +283,10 @@ func initMainApp() {
 		OnPlayButtonClick(animeName.Text, animeSelected)
 	})
 
-	button.IconPlacement = widget.ButtonIconTrailingText
-	button.Importance = widget.HighImportance
+	playButton.IconPlacement = widget.ButtonIconTrailingText
+	playButton.Importance = widget.HighImportance
 
-	playContainer := container.NewHBox(layout.NewSpacer(), button, layout.NewSpacer())
+	playContainer := container.NewPadded(container.NewBorder(nil, nil, layout.NewSpacer(), widget.NewButtonWithIcon("", theme.MoreHorizontalIcon(), func() {}), playButton))
 
 	imageContainer := container.NewVBox(imageEx, animeName, episodeContainer, nextEpisodeLabel, episodeLastPlayback, layout.NewSpacer(), playContainer)
 

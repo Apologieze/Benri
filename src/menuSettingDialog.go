@@ -17,10 +17,12 @@ func initMenuOption() {
 		widget.NewCheck("", func(b bool) { fmt.Println(b) }),
 		widget.NewLabelWithStyle("Automatically skip Ending", fyne.TextAlignLeading, fyne.TextStyle{Bold: true}),
 		widget.NewCheck("", func(b bool) { fmt.Println(b) }),
+		widget.NewLabelWithStyle("Add a tray icon for Benri", fyne.TextAlignLeading, fyne.TextStyle{Bold: true}),
+		widget.NewCheck("", func(b bool) { fmt.Println(b) }),
 	)
 	//form := container.New(layout.NewFormLayout(), rowSkipOpening)
 	menuOption := container.NewBorder(nil, nil, nil, nil, rowSkipOpening)
-	dialogMenuOption = dialog.NewCustom("Menu", "Close menu", menuOption, window)
+	dialogMenuOption = dialog.NewCustom("Settings", "Close menu", menuOption, window)
 	dialogMenuOption.Resize(fyne.NewSize(200, 300))
 }
 

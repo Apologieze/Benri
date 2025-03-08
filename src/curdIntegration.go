@@ -289,14 +289,30 @@ func deleteTokenFile() {
 
 func displayLocalProgress() {
 	localDbAnime := SearchFromLocalAniId(animeSelected.Media.ID)
+	currentEp := min(*animeSelected.Progress+1, *animeSelected.Media.Episodes)
+	playButton.Text = fmt.Sprint("Play Ep", currentEp)
 	if localDbAnime != nil {
 		episodeLastPlayback.Show()
-		if localDbAnime.Ep.Number == *animeSelected.Progress && localDbAnime.Ep.Player.PlaybackTime == 0 {
-			episodeLastPlayback.SetText(fmt.Sprintf("Just finished Episode %d", localDbAnime.Ep.Number))
-		} else {
-			episodeLastPlayback.SetText(fmt.Sprintf("Last saved at EP%d: [%s]", localDbAnime.Ep.Number+1, time.Second*time.Duration(localDbAnime.Ep.Player.PlaybackTime)))
+		if localDbAnime.Ep.Number == *animeSelected.Progress {
+			if localDbAnime.Ep.Player.PlaybackTime == 0 {
+				episodeLastPlayback.SetText(fmt.Sprintf("Just finished Episode %d", localDbAnime.Ep.Number))
+			} else {
+				episodeLastPlayback.SetText(fmt.Sprintf("Last saved at EP%d: [%s]", localDbAnime.Ep.Number+1, time.Second*time.Duration(localDbAnime.Ep.Player.PlaybackTime)))
+				playButton.Text = fmt.Sprint("Resuming Ep", currentEp)
+			}
 		}
 	} else {
 		episodeLastPlayback.Hide()
 	}
+	setPlayButtonVisibility()
+}
+
+func setPlayButtonVisibility() {
+	if animeSelected.Media.NextAiringEpisode != nil {
+		if *animeSelected.Progress+1 == animeSelected.Media.NextAiringEpisode.Episode {
+			playButton.Hide()
+			return
+		}
+	}
+	playButton.Show()
 }
