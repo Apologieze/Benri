@@ -3,6 +3,7 @@ package main
 import (
 	curd "AnimeGUI/curdInteg"
 	"AnimeGUI/src/anilist"
+	"AnimeGUI/src/config"
 	"AnimeGUI/verniy"
 	"fmt"
 	"fyne.io/fyne/v2"
@@ -44,12 +45,12 @@ func main() {
 
 	go dowloadMPV()
 
-	appW = app.New()
+	appW = app.NewWithID("fr.apologize.benri")
+
 	window = appW.NewWindow(AppName)
 	window.Resize(fyne.NewSize(1000, 700))
 	window.CenterOnScreen()
 
-	initMenuOption()
 	window.Show()
 
 	appW.Settings().SetTheme(&forcedVariant{
@@ -324,6 +325,9 @@ func initMainApp() {
 		*imageEx = *getAnimeImageFromImage(imageFile, 300)
 		imageContainer.Refresh()
 	}
+
+	config.CreateConfig(appW.Preferences())
+	initMenuOption()
 
 	window.SetContent(fynetooltip.AddWindowToolTipLayer(container.NewBorder(nil, nil, nil, imageContainer, leftSide), window.Canvas()))
 }
