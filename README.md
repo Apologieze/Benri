@@ -23,3 +23,7 @@
    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=Apologieze/Benri&type=Date" />
  </picture>
 </a>
+
+## Credits
+- [curd](https://github.com/Wraient/curd) - For the inspiration and for the video fetching and streaming code
+- [verniy](https://github.com/rl404/verniy) - To help me get data from the Anilist GraphQL API
