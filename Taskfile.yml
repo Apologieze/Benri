@@ -4,3 +4,7 @@ tasks:
   package-w:
     cmds:
       - fyne package --sourceDir ./src/ -os windows -icon ../asset/icon.jpg -name Benri
+
+  package-l:
+    cmds:
+      - fyne package --sourceDir ./src/ -os linux -icon ../asset/icon.jpg -name Benri
