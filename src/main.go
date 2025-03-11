@@ -164,6 +164,7 @@ func changeEpisodeInApp(variation int) {
 		go UpdateAnimeProgress(currentSelected.Media.ID, newNumber)
 		currentSelected.Progress = &newNumber
 		episodeNumber.SetText(fmt.Sprintf("Episode %d/%d", newNumber, *currentSelected.Media.Episodes))
+		displayLocalProgress()
 	}
 }
 
