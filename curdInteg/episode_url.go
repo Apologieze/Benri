@@ -58,12 +58,12 @@ func decodeProviderID(encoded string) string {
 
 func extractLinks(provider_id string) map[string]interface{} {
 	allanime_base := "https://allanime.day"
-	url := allanime_base + provider_id
+	localUrl := allanime_base + provider_id
 	client := &http.Client{}
-	req, err := http.NewRequest("GET", url, nil)
+	req, err := http.NewRequest("GET", localUrl, nil)
 	var videoData map[string]interface{}
 	if err != nil {
-		Log(fmt.Sprint("Error creating request:", err), logFile)
+		log.Error(fmt.Sprint("Error creating request:", err))
 		return videoData
 	}
 
@@ -74,7 +74,7 @@ func extractLinks(provider_id string) map[string]interface{} {
 	// Send the request
 	resp, err := client.Do(req)
 	if err != nil {
-		Log(fmt.Sprint("Error sending request:", err), logFile)
+		log.Error(fmt.Sprint("Error sending request:", err))
 		return videoData
 	}
 	defer resp.Body.Close()
@@ -165,9 +165,9 @@ func GetEpisodeURL(config CurdConfig, id string, epNo int) ([]string, error) {
 	var wg sync.WaitGroup
 	resultChan := make(chan []string, 1) // Buffer for immediate return
 
-	for _, url := range response.Data.Episode.SourceUrls {
-		if len(url.SourceUrl) > 2 && unicode.IsDigit(rune(url.SourceUrl[2])) {
-			decodedProviderID := decodeProviderID(url.SourceUrl[2:])
+	for _, sourceURLS := range response.Data.Episode.SourceUrls {
+		if len(sourceURLS.SourceUrl) > 2 && unicode.IsDigit(rune(sourceURLS.SourceUrl[2])) {
+			decodedProviderID := decodeProviderID(sourceURLS.SourceUrl[2:])
 
 			wg.Add(1)
 			go func(id string) {

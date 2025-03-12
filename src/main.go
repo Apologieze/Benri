@@ -331,5 +331,5 @@ func initMainApp() {
 	initMenuOption()
 
 	window.SetContent(fynetooltip.AddWindowToolTipLayer(container.NewBorder(nil, nil, nil, imageContainer, leftSide), window.Canvas()))
-	//window.Canvas().Focus(input)
+	window.Canvas().Focus(input)
 }

@@ -1,0 +1,8 @@
+Website = "https://apologize.fr/benri"
+
+[Details]
+Icon = "Icon.png"
+Name = "Benri"
+ID = "fr.apologize.benri"
+Version = "0.1.0"
+Build = 1

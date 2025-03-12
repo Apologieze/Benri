@@ -3,8 +3,8 @@ version: '3'
 tasks:
   package-w:
     cmds:
-      - fyne package --sourceDir ./src/ -os windows -icon ../asset/icon.jpg -name Benri
+      - fyne package --sourceDir ./src/ -icon ../asset/Icon.png -os windows -name Benri
 
   package-l:
     cmds:
-      - fyne package --sourceDir ./src/ -os linux -icon ../asset/icon.jpg -name Benri
+      - fyne package --sourceDir ./src/ -os linux -icon ../asset/Icon.png -name Benri
