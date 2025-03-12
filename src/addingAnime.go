@@ -176,4 +176,5 @@ func setDialogAddAnime(radiobox *widget.RadioGroup) {
 	}))
 
 	dialogAdd.Show()
+	window.Canvas().Focus(inputSearch)
 }

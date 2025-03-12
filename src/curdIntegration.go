@@ -289,12 +289,16 @@ func deleteTokenFile() {
 
 func displayLocalProgress() {
 	localDbAnime := SearchFromLocalAniId(animeSelected.Media.ID)
-	currentEp := min(*animeSelected.Progress+1, *animeSelected.Media.Episodes)
+	fmt.Println(*animeSelected)
+	AnimeProgress := IntPointerFallback(animeSelected.Progress, 0)
+	AnimeEpisode := IntPointerFallback(animeSelected.Media.Episodes, 0)
+
+	currentEp := min(AnimeProgress+1, AnimeEpisode)
 	playButton.Text = fmt.Sprint("Play Ep", currentEp)
 	fmt.Println("Current Ep:", currentEp)
 	if localDbAnime != nil {
 		episodeLastPlayback.Show()
-		if localDbAnime.Ep.Number == *animeSelected.Progress {
+		if localDbAnime.Ep.Number == AnimeProgress {
 			if localDbAnime.Ep.Player.PlaybackTime == 0 {
 				episodeLastPlayback.SetText(fmt.Sprintf("Just finished Episode %d", localDbAnime.Ep.Number))
 			} else {
@@ -317,4 +321,11 @@ func setPlayButtonVisibility() {
 		}
 	}
 	playButton.Show()
+}
+
+func IntPointerFallback(ptr *int, value int) int {
+	if ptr == nil {
+		return value
+	}
+	return *ptr
 }
