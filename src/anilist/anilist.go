@@ -35,7 +35,9 @@ var fields = []verniy.MediaListGroupField{
 			verniy.MediaFieldAverageScore,
 			verniy.MediaFieldPopularity,
 			verniy.MediaFieldIsAdult,
-			verniy.MediaFieldEpisodes)),
+			verniy.MediaFieldEpisodes,
+			verniy.MediaFieldSeasonYear,
+			verniy.MediaFieldSeason)),
 }
 
 var UserData []verniy.MediaListGroup

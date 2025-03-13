@@ -33,7 +33,7 @@ func initMenuOption() {
 	)
 	//form := container.New(layout.NewFormLayout(), rowSkipOpening)
 	menuOption := container.NewBorder(nil, nil, nil, nil, rowSkipOpening)
-	dialogMenuOption = dialog.NewCustom("Settings", "Close menu", menuOption, window)
+	dialogMenuOption = dialog.NewCustom("Settings", "Close Settings", menuOption, window)
 	dialogMenuOption.Resize(fyne.NewSize(200, 300))
 }
 
