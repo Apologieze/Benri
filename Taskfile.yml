@@ -4,6 +4,7 @@ tasks:
   package-w:
     cmds:
       - fyne package --sourceDir ./src/ -icon ../asset/Icon.png -os windows -name Benri
+      - cmd /c ".\icon\replaceIco.bat"
 
   package-l:
     cmds:
