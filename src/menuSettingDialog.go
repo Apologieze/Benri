@@ -13,7 +13,7 @@ import (
 
 var dialogMenuOption *dialog.CustomDialog
 
-func initMenuOption() {
+func initSettingDialog() {
 	checkSkipOpening := widget.NewCheck("", func(b bool) { config.SetBool(config.SkipOpeningKey, b) })
 	checkSkipEnding := widget.NewCheck("", func(b bool) { config.SetBool(config.SkipEndingKey, b) })
 	checkTrayIcon := widget.NewCheck("", func(b bool) {

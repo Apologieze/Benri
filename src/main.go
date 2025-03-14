@@ -288,7 +288,10 @@ func initMainApp() {
 	playButton.IconPlacement = widget.ButtonIconTrailingText
 	playButton.Importance = widget.HighImportance
 
-	playContainer := container.NewPadded(container.NewBorder(nil, nil, layout.NewSpacer(), widget.NewButtonWithIcon("", theme.MoreHorizontalIcon(), func() {}), playButton))
+	moreActionButton := widget.NewButtonWithIcon("", theme.MoreHorizontalIcon(), func() {
+		openPlayMoreDialog()
+	})
+	playContainer := container.NewPadded(container.NewBorder(nil, nil, layout.NewSpacer(), moreActionButton, playButton))
 
 	imageContainer := container.NewVBox(imageEx, animeName, episodeContainer, nextEpisodeLabel, episodeLastPlayback, layout.NewSpacer(), playContainer)
 
@@ -328,7 +331,8 @@ func initMainApp() {
 	}
 
 	config.CreateConfig(appW.Preferences())
-	initMenuOption()
+	initSettingDialog()
+	initPlayMoreDialog()
 
 	window.SetContent(fynetooltip.AddWindowToolTipLayer(container.NewBorder(nil, nil, nil, imageContainer, leftSide), window.Canvas()))
 	window.Canvas().Focus(input)
