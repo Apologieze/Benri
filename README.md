@@ -26,4 +26,5 @@
 
 ## Credits
 - [curd](https://github.com/Wraient/curd) - For the inspiration and for the video fetching and streaming code
+- [fyne](https://github.com/fyne-io/fyne-io.github.io) - For cross-platform GUI
 - [verniy](https://github.com/rl404/verniy) - To help me get data from the Anilist GraphQL API
