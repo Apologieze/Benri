@@ -27,6 +27,11 @@ import (
 	"time"
 )
 
+const (
+	AppID   = "fr.apologize.benri"
+	AppName = "AnimeGUI"
+)
+
 var (
 	animeList           *[]verniy.MediaList
 	animeSelected       *verniy.MediaList
@@ -42,11 +47,10 @@ var (
 )
 
 func main() {
-	const AppName = "AnimeGUI"
 
 	go dowloadMPV()
 
-	appW = app.NewWithID("fr.apologize.benri")
+	appW = app.NewWithID(AppID)
 
 	window = appW.NewWindow(AppName)
 	window.Resize(fyne.NewSize(1000, 700))

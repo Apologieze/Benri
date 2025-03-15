@@ -20,6 +20,7 @@ func initPlayMorePopUp() {
 		if animeName.Text == "" {
 			return
 		}
+		playMorePopUp.Hide()
 		OnPlayButtonClick(animeName.Text, animeSelected, false)
 	})
 	playPreviousButton.IconPlacement = widget.ButtonIconTrailingText

@@ -219,6 +219,10 @@ func playingAnimeLoop(playingAnime curd.Anime, animeData *verniy.MediaList, savi
 						playingAnime.Ep.Duration = int(duration + 0.5) // Round to nearest integer
 						log.Infof("Video duration: %d seconds", playingAnime.Ep.Duration)
 
+						if !savingWatch {
+							playingAnime.Ep.Player.PlaybackTime = int(float64(playingAnime.Ep.Duration) * 0.70)
+						}
+
 						if playingAnime.Ep.Player.PlaybackTime > 10 {
 							_, err := curd.SeekMPV(playingAnime.Ep.Player.SocketPath, max(0, playingAnime.Ep.Player.PlaybackTime-5))
 							if err != nil {
