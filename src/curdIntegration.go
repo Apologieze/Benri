@@ -95,7 +95,7 @@ type AllAnimeIdData struct {
 	Name string
 }
 
-func OnPlayButtonClick(animeName string, animeData *verniy.MediaList) {
+func OnPlayButtonClick(animeName string, animeData *verniy.MediaList, savingWatch bool) {
 	if mpvPresent == false {
 		log.Error("MPV is not yet dl")
 		return
@@ -130,6 +130,9 @@ func OnPlayButtonClick(animeName string, animeData *verniy.MediaList) {
 	log.Info("AllAnimeId!!!!!:", allAnimeId)
 
 	animeProgress++
+	if !savingWatch {
+		animeProgress = max(animeProgress-1, 1)
+	}
 
 	log.Info("Anime Progress:", animeProgress)
 
@@ -164,7 +167,7 @@ func OnPlayButtonClick(animeName string, animeData *verniy.MediaList) {
 			playingAnime.Ep.Player.PlaybackTime = animePointer.Ep.Player.PlaybackTime
 		}
 	}
-	playingAnimeLoop(playingAnime, animeData)
+	playingAnimeLoop(playingAnime, animeData, savingWatch)
 }
 
 func searchAllAnimeData(animeName string, epNumber *int, animeProgress int) string {
@@ -200,7 +203,7 @@ func searchAllAnimeData(animeName string, epNumber *int, animeProgress int) stri
 	return AllanimeId
 }
 
-func playingAnimeLoop(playingAnime curd.Anime, animeData *verniy.MediaList) {
+func playingAnimeLoop(playingAnime curd.Anime, animeData *verniy.MediaList, savingWatch bool) {
 	fmt.Println(playingAnime.Ep.Player.PlaybackTime, "ah oue")
 	// Get video duration
 	go func() {
@@ -236,25 +239,27 @@ func playingAnimeLoop(playingAnime curd.Anime, animeData *verniy.MediaList) {
 			time.Sleep(1 * time.Second)
 			timePos, err := curd.MPVSendCommand(playingAnime.Ep.Player.SocketPath, []interface{}{"get_property", "time-pos"})
 			if err != nil {
-				log.Error("Error getting video position: " + err.Error())
-				fmt.Println("EH en vrai", playingAnime.Ep.Player.PlaybackTime, playingAnime.Ep.Duration)
-				percentageWatched := curd.PercentageWatched(playingAnime.Ep.Player.PlaybackTime, playingAnime.Ep.Duration)
+				if savingWatch {
+					log.Error("Error getting video position: " + err.Error())
+					fmt.Println("EH en vrai", playingAnime.Ep.Player.PlaybackTime, playingAnime.Ep.Duration)
+					percentageWatched := curd.PercentageWatched(playingAnime.Ep.Player.PlaybackTime, playingAnime.Ep.Duration)
 
-				if int(percentageWatched) >= userCurdConfig.PercentageToMarkComplete {
-					playingAnime.Ep.Number++
-					playingAnime.Ep.Player.PlaybackTime = 0
-					var newProgress int = playingAnime.Ep.Number
-					animeData.Progress = &newProgress
-					go UpdateAnimeProgress(playingAnime.AnilistId, playingAnime.Ep.Number)
-					episodeNumber.SetText(fmt.Sprintf("Episode %d/%d", playingAnime.Ep.Number, playingAnime.TotalEpisodes))
-				}
+					if int(percentageWatched) >= userCurdConfig.PercentageToMarkComplete {
+						playingAnime.Ep.Number++
+						playingAnime.Ep.Player.PlaybackTime = 0
+						var newProgress int = playingAnime.Ep.Number
+						animeData.Progress = &newProgress
+						go UpdateAnimeProgress(playingAnime.AnilistId, playingAnime.Ep.Number)
+						episodeNumber.SetText(fmt.Sprintf("Episode %d/%d", playingAnime.Ep.Number, playingAnime.TotalEpisodes))
+					}
 
-				err, tempAnime := curd.LocalUpdateAnime(databaseFile, playingAnime.AnilistId, playingAnime.AllanimeId, playingAnime.Ep.Number, playingAnime.Ep.Player.PlaybackTime, 0, playingAnime.Title.English)
-				if err == nil && tempAnime != nil {
-					log.Info("Successfully updated database file")
-					localAnime = curd.LocalGetAllAnime(databaseFile)
+					err, tempAnime := curd.LocalUpdateAnime(databaseFile, playingAnime.AnilistId, playingAnime.AllanimeId, playingAnime.Ep.Number, playingAnime.Ep.Player.PlaybackTime, 0, playingAnime.Title.English)
+					if err == nil && tempAnime != nil {
+						log.Info("Successfully updated database file")
+						localAnime = curd.LocalGetAllAnime(databaseFile)
+					}
+					displayLocalProgress()
 				}
-				displayLocalProgress()
 				break
 			}
 			if timePos != nil && playingAnime.Ep.Duration != 0 {

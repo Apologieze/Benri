@@ -38,6 +38,7 @@ var (
 	changedToken        bool
 	mpvPresent          bool
 	grayScaleList       uint8 = 35
+	animeName           *ttwidget.Label
 )
 
 func main() {
@@ -147,7 +148,7 @@ func selectCorrectLinking(allAnimeList []AllAnimeIdData, animeName string, anime
 		if tempAnime != nil {
 			localAnime = tempAnime
 		}
-		OnPlayButtonClick(animeName, animeSelected)
+		OnPlayButtonClick(animeName, animeSelected, true)
 	}
 
 	dialogC.Resize(fyne.NewSize(600, 900))
@@ -264,7 +265,7 @@ func initMainApp() {
 
 	imageEx := &canvas.Image{}
 
-	animeName := ttwidget.NewLabelWithStyle("", fyne.TextAlignCenter, fyne.TextStyle{Bold: true})
+	animeName = ttwidget.NewLabelWithStyle("", fyne.TextAlignCenter, fyne.TextStyle{Bold: true})
 	animeName.Wrapping = fyne.TextWrapWord
 
 	episodeMinus := widget.NewButtonWithIcon("", theme.ContentRemoveIcon(), func() { changeEpisodeInApp(-1) })
@@ -282,7 +283,7 @@ func initMainApp() {
 		if animeName.Text == "" {
 			return
 		}
-		OnPlayButtonClick(animeName.Text, animeSelected)
+		OnPlayButtonClick(animeName.Text, animeSelected, true)
 	})
 
 	playButton.IconPlacement = widget.ButtonIconTrailingText

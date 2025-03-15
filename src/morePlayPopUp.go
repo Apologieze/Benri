@@ -16,8 +16,11 @@ func initPlayMorePopUp() {
 	checkTrayIcon := widget.NewCheck("", func(b bool) {
 	})*/
 
-	playPreviousButton := widget.NewButtonWithIcon("Play previous episode", theme.Icon(theme.IconNameMediaPlay), func() {
-
+	playPreviousButton := widget.NewButtonWithIcon("Rewatch previous episode", theme.Icon(theme.IconNameMediaPlay), func() {
+		if animeName.Text == "" {
+			return
+		}
+		OnPlayButtonClick(animeName.Text, animeSelected, false)
 	})
 	playPreviousButton.IconPlacement = widget.ButtonIconTrailingText
 
