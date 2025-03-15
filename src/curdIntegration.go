@@ -296,8 +296,8 @@ func displayLocalProgress() {
 	playButton.Text = fmt.Sprint("Play Ep", currentEp)
 	fmt.Println("Current Ep:", currentEp)
 	if localDbAnime != nil {
-		episodeLastPlayback.Show()
 		if localDbAnime.Ep.Number == AnimeProgress {
+			episodeLastPlayback.Show()
 			if localDbAnime.Ep.Player.PlaybackTime == 0 {
 				episodeLastPlayback.SetText(fmt.Sprintf("Just finished Episode %d", localDbAnime.Ep.Number))
 			} else {

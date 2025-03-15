@@ -289,7 +289,7 @@ func initMainApp() {
 	playButton.Importance = widget.HighImportance
 
 	moreActionButton := widget.NewButtonWithIcon("", theme.MoreHorizontalIcon(), func() {
-		openPlayMoreDialog()
+		openPlayMorePopUp()
 	})
 	playContainer := container.NewPadded(container.NewBorder(nil, nil, layout.NewSpacer(), moreActionButton, playButton))
 
@@ -332,7 +332,7 @@ func initMainApp() {
 
 	config.CreateConfig(appW.Preferences())
 	initSettingDialog()
-	initPlayMoreDialog()
+	initPlayMorePopUp()
 
 	window.SetContent(fynetooltip.AddWindowToolTipLayer(container.NewBorder(nil, nil, nil, imageContainer, leftSide), window.Canvas()))
 	window.Canvas().Focus(input)

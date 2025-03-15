@@ -8,9 +8,9 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-var playMoreDialog *widget.PopUp
+var playMorePopUp *widget.PopUp
 
-func initPlayMoreDialog() {
+func initPlayMorePopUp() {
 	/*checkSkipOpening := widget.NewCheck("", func(b bool) {})
 	checkSkipEnding := widget.NewCheck("", func(b bool) {})
 	checkTrayIcon := widget.NewCheck("", func(b bool) {
@@ -29,10 +29,13 @@ func initPlayMoreDialog() {
 	vbox := container.NewVBox(layout.NewSpacer(), playPreviousButton, layout.NewSpacer())
 
 	menuOption := container.NewBorder(nil, nil, nil, nil, container.NewPadded(vbox))
-	playMoreDialog = widget.NewPopUp(menuOption, window.Canvas())
-	//playMoreDialog.Resize(fyne.NewSize(200, 100))
+	playMorePopUp = widget.NewPopUp(menuOption, window.Canvas())
+	playMorePopUp.Resize(fyne.NewSize(290, 100))
 }
 
-func openPlayMoreDialog() {
-	playMoreDialog.ShowAtRelativePosition(fyne.Position{X: 100}, episodeLastPlayback)
+func openPlayMorePopUp() {
+	//sizeW := window.Canvas().Size()
+	//sizePopup := playMorePopUp.Size()
+	//playMorePopUp.ShowAtPosition(fyne.Position{sizeW.Width - sizePopup.Width - 50, sizeW.Height - sizePopup.Height - 50})
+	playMorePopUp.ShowAtRelativePosition(fyne.Position{X: 0, Y: -110}, playButton)
 }

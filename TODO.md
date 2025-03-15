@@ -11,3 +11,9 @@
 | 🚧 In Progress | 🟡 Medium |                                                                               |
 | ✅ Done         | 🟡 Medium | Packaging with correct icon and systray windows + linux                       |
 | ✅ Done         | 🔴 High   | Make the app work on windows and linux                                        |
+
+### Small todo
+
+- [ ] Watching last episode should refresh data
+
+- [ ] Having an indicator if new ep is out
