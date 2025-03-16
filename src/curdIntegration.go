@@ -220,7 +220,7 @@ func playingAnimeLoop(playingAnime curd.Anime, animeData *verniy.MediaList, savi
 						log.Infof("Video duration: %d seconds", playingAnime.Ep.Duration)
 
 						if !savingWatch {
-							playingAnime.Ep.Player.PlaybackTime = int(float64(playingAnime.Ep.Duration) * 0.70)
+							playingAnime.Ep.Player.PlaybackTime = int(float64(playingAnime.Ep.Duration) * 0.80)
 						}
 
 						if playingAnime.Ep.Player.PlaybackTime > 10 {
