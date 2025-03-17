@@ -29,7 +29,7 @@ import (
 
 const (
 	AppID   = "fr.apologize.benri"
-	AppName = "AnimeGUI"
+	AppName = "Benri"
 )
 
 var (
@@ -48,10 +48,18 @@ var (
 )
 
 func main() {
+	appW = app.NewWithID(AppID)
+
+	config.CreateConfig(appW.Preferences())
+	if config.Setting.TrayIcon {
+		// Initialize lockfile
+		lock := initLock()
+		defer lock.Unlock()
+	}
+
+	go pollingNewAppDetection()
 
 	go dowloadMPV()
-
-	appW = app.NewWithID(AppID)
 
 	window = appW.NewWindow(AppName)
 	window.Resize(fyne.NewSize(1000, 700))
@@ -69,8 +77,10 @@ func main() {
 	if !changedToken {
 		fmt.Println(window.Title(), AppName)
 		initMainApp()
+
 		appW.Run()
 	}
+
 }
 
 func updateAnimeNames(data *binding.ExternalStringList) (first bool) {
@@ -336,7 +346,6 @@ func initMainApp() {
 		imageContainer.Refresh()
 	}
 
-	config.CreateConfig(appW.Preferences())
 	initSettingDialog()
 	initPlayMorePopUp()
 

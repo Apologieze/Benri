@@ -13,6 +13,7 @@ require (
 	github.com/dweymouth/fyne-tooltip v0.2.1
 	github.com/gen2brain/beeep v0.0.0-20240516210008-9c006672e7f4
 	github.com/hugolgst/rich-go v0.0.0-20240715122152-74618cc1ace2
+	github.com/nightlyone/lockfile v1.0.0
 )
 
 require (
