@@ -253,7 +253,7 @@ func playingAnimeLoop(playingAnime curd.Anime, animeData *verniy.MediaList, savi
 						playingAnime.Ep.Player.PlaybackTime = 0
 						var newProgress int = playingAnime.Ep.Number
 						animeData.Progress = &newProgress
-						go UpdateAnimeProgress(playingAnime.AnilistId, playingAnime.Ep.Number)
+						go UpdateProgressHandler(playingAnime)
 						episodeNumber.SetText(fmt.Sprintf("Episode %d/%d", playingAnime.Ep.Number, playingAnime.TotalEpisodes))
 					}
 
@@ -281,12 +281,19 @@ func playingAnimeLoop(playingAnime curd.Anime, animeData *verniy.MediaList, savi
 
 }
 
+func UpdateProgressHandler(anime curd.Anime) {
+	UpdateAnimeProgress(anime.AnilistId, anime.Ep.Number)
+	if anime.TotalEpisodes == anime.Ep.Number {
+		// Mark as complete
+		go anilist.GetData(categoryRadiobox, user.Username, func() { log.Error("Invalid token") })
+	}
+}
+
 func UpdateAnimeProgress(animeId int, episode int) {
 	err := curd.UpdateAnimeProgress(user.Token, animeId, episode)
 	if err != nil {
 		log.Error(err)
 	}
-
 }
 
 func deleteTokenFile() {
@@ -304,21 +311,23 @@ func displayLocalProgress() {
 	currentEp := min(AnimeProgress+1, AnimeEpisode)
 	playButton.Text = fmt.Sprint("Play Ep", currentEp)
 	fmt.Println("Current Ep:", currentEp)
+
+	setPlayButtonVisibility()
 	if localDbAnime != nil {
 		if localDbAnime.Ep.Number == AnimeProgress {
-			episodeLastPlayback.Show()
 			if localDbAnime.Ep.Player.PlaybackTime == 0 {
 				episodeLastPlayback.SetText(fmt.Sprintf("Just finished Episode %d", localDbAnime.Ep.Number))
+				episodeLastPlayback.Show()
+				return
 			} else {
 				episodeLastPlayback.SetText(fmt.Sprintf("Last saved at EP%d: [%s]", localDbAnime.Ep.Number+1, time.Second*time.Duration(localDbAnime.Ep.Player.PlaybackTime)))
 				playButton.Text = fmt.Sprint("Resuming Ep", currentEp)
+				episodeLastPlayback.Show()
+				return
 			}
 		}
-	} else {
-		episodeLastPlayback.Hide()
 	}
-	setPlayButtonVisibility()
-	playButton.Refresh()
+	episodeLastPlayback.Hide()
 }
 
 func setPlayButtonVisibility() {

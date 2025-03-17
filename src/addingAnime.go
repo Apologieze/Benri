@@ -40,7 +40,7 @@ var displayCategories = []string{
 	"Dropped",
 }
 
-func setDialogAddAnime(radiobox *widget.RadioGroup) {
+func setDialogAddAnime() {
 	var searchResult []verniy.Media
 	var selectedAnime *verniy.Media
 	var selectedAnimeStatus string
@@ -111,7 +111,7 @@ func setDialogAddAnime(radiobox *widget.RadioGroup) {
 			return
 		}
 		log.Info("Anime added successfully")
-		go anilist.GetData(radiobox, user.Username, func() { log.Error("Invalid token") })
+		go anilist.GetData(categoryRadiobox, user.Username, func() { log.Error("Invalid token") })
 		dialogAdd.Hide()
 	}
 

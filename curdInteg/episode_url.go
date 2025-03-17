@@ -166,6 +166,7 @@ func GetEpisodeURL(config CurdConfig, id string, epNo int) ([]string, error) {
 	resultChan := make(chan []string, 1) // Buffer for immediate return
 
 	for _, sourceURLS := range response.Data.Episode.SourceUrls {
+		//fmt.Println(sourceURLS.SourceUrl)
 		if len(sourceURLS.SourceUrl) > 2 && unicode.IsDigit(rune(sourceURLS.SourceUrl[2])) {
 			decodedProviderID := decodeProviderID(sourceURLS.SourceUrl[2:])
 

@@ -44,6 +44,7 @@ var (
 	mpvPresent          bool
 	grayScaleList       uint8 = 35
 	animeName           *ttwidget.Label
+	categoryRadiobox    *widget.RadioGroup
 )
 
 func main() {
@@ -196,7 +197,7 @@ func initMainApp() {
 	input := widget.NewEntry()
 	input.SetPlaceHolder("Filter anime name")
 
-	radiobox := widget.NewRadioGroup([]string{"Watching", "Planning", "Completed", "Dropped"}, func(s string) {
+	categoryRadiobox = widget.NewRadioGroup([]string{"Watching", "Planning", "Completed", "Dropped"}, func(s string) {
 		if input.Text == "" {
 			animeList = anilist.FindList(s)
 		} else {
@@ -208,16 +209,16 @@ func initMainApp() {
 			listDisplay.ScrollToTop()
 		}
 	})
-	radiobox.Required = true
-	radiobox.Horizontal = true
+	categoryRadiobox.Required = true
+	categoryRadiobox.Horizontal = true
 
 	input.OnChanged = func(s string) {
 		debounced(func() {
 			fmt.Println("Search:", s)
 			if s == "" {
-				animeList = anilist.FindList(radiobox.Selected)
+				animeList = anilist.FindList(categoryRadiobox.Selected)
 			} else {
-				animeList = anilist.FindListWithQuery(radiobox.Selected, s)
+				animeList = anilist.FindListWithQuery(categoryRadiobox.Selected, s)
 			}
 			if updateAnimeNames(&data) {
 				listDisplay.Unselect(0)
@@ -229,7 +230,7 @@ func initMainApp() {
 
 	toolbar := widget.NewToolbar(
 		widget.NewToolbarAction(theme.ContentAddIcon(), func() {
-			setDialogAddAnime(radiobox)
+			setDialogAddAnime()
 		}),
 		widget.NewToolbarSeparator(),
 		widget.NewToolbarAction(theme.MailAttachmentIcon(), func() {
@@ -255,7 +256,7 @@ func initMainApp() {
 
 	vbox := container.NewVBox(
 		inputContainer,
-		radiobox,
+		categoryRadiobox,
 	)
 
 	/*if themeVariant == theme.VariantDark {
@@ -265,7 +266,7 @@ func initMainApp() {
 
 	leftSide := container.NewBorder(vbox, nil, nil, nil, listContainer)
 
-	go anilist.GetData(radiobox, user.Username, deleteTokenFile)
+	go anilist.GetData(categoryRadiobox, user.Username, deleteTokenFile)
 
 	imageEx := &canvas.Image{}
 
