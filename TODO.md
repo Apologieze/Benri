@@ -2,7 +2,7 @@
 
 | Status         | Priority  | Task                                                                          |
 |----------------|-----------|-------------------------------------------------------------------------------|
-| 🚧 In Progress | 🔴 High   | Opening a new app check if already running instance                           |
+| ✅ Done         | 🔴 High   | Opening a new app check if already running instance                           |
 | 🚧 In Progress | 🔴 High   | Fix "Last saved" message bug on first selected anime                          |
 | 📝 To do       | 🟡 Medium | Make skipping option actually work                                            |
 | 📝 To do       | 🟡 Medium | Custom discord presence                                                       |
