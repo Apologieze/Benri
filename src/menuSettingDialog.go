@@ -20,16 +20,19 @@ func initSettingDialog() {
 		config.SetBool(config.TrayIconKey, b)
 		fmt.Println(config.Setting.TrayIcon)
 	})
+	checkDiscordPresence := widget.NewCheck("", func(b bool) { config.SetBool(config.DiscordPresence, b) })
 
 	checkSkipOpening.SetChecked(config.Setting.SkipOpening)
 	checkSkipEnding.SetChecked(config.Setting.SkipEnding)
 	checkTrayIcon.SetChecked(config.Setting.TrayIcon)
+	checkDiscordPresence.SetChecked(config.Setting.DiscordPresence)
 	toggleTrayFeature()
 
 	rowSkipOpening := container.New(layout.NewFormLayout(),
 		widget.NewLabelWithStyle("Automatically skip Opening", fyne.TextAlignLeading, fyne.TextStyle{Bold: true}), checkSkipOpening,
 		widget.NewLabelWithStyle("Automatically skip Ending", fyne.TextAlignLeading, fyne.TextStyle{Bold: true}), checkSkipEnding,
 		widget.NewLabelWithStyle("Add a tray icon for Benri", fyne.TextAlignLeading, fyne.TextStyle{Bold: true}), checkTrayIcon,
+		widget.NewLabelWithStyle("Show Discord Activity", fyne.TextAlignLeading, fyne.TextStyle{Bold: true}), checkDiscordPresence,
 	)
 	//form := container.New(layout.NewFormLayout(), rowSkipOpening)
 	menuOption := container.NewBorder(nil, nil, nil, nil, rowSkipOpening)

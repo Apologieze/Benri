@@ -4,6 +4,7 @@ import (
 	curd "AnimeGUI/curdInteg"
 	"AnimeGUI/src/anilist"
 	"AnimeGUI/src/config"
+	"AnimeGUI/src/richPresence"
 	"AnimeGUI/verniy"
 	"fmt"
 	"fyne.io/fyne/v2"
@@ -59,6 +60,8 @@ func main() {
 	}
 
 	go dowloadMPV()
+
+	richPresence.InitDiscordRichPresence()
 
 	window = appW.NewWindow(AppName)
 	window.Resize(fyne.NewSize(1000, 700))
