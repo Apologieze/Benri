@@ -3,14 +3,15 @@ package main
 import (
 	"fmt"
 	"github.com/charmbracelet/log"
+	"github.com/fsnotify/fsnotify"
 	"github.com/nightlyone/lockfile"
 	"os"
-	"time"
+	"path/filepath"
 )
 
 var (
-	lockPath   = os.TempDir() + "/" + AppName + ".lock"
-	notifyPath = os.TempDir() + "/" + AppName + ".notify"
+	lockPath   = filepath.Join(os.TempDir(), AppName+".lock")
+	notifyPath = filepath.Join(os.TempDir(), AppName+".notify")
 )
 
 func initLock() lockfile.Lockfile {
@@ -26,33 +27,50 @@ func initLock() lockfile.Lockfile {
 		fmt.Println("Application is already running")
 
 		// Touch the notification file to signal the first instance
-		currentTime := []byte(fmt.Sprintf("%d", time.Now().UnixNano()))
-		_ = os.WriteFile(notifyPath, currentTime, 0644)
+		_ = os.WriteFile(notifyPath, []byte{}, 0644)
 
 		os.Exit(0)
 	}
 	return lock
 }
 
-func pollingNewAppDetection() {
-	var lastModTime time.Time
+func fsnotifyNewAppDetection() {
+	watcher, err := fsnotify.NewWatcher()
+	if err != nil {
+		log.Error("Error creating watcher", "error", err)
+		return
+	}
+	defer watcher.Close()
 
-	info, err := os.Stat(notifyPath)
-	if err == nil {
-		lastModTime = info.ModTime()
+	notifyDir := filepath.Dir(notifyPath)
+
+	err = watcher.Add(notifyDir)
+	if err != nil {
+		log.Error("Error watching directory", "error", err)
+		return
 	}
 
+	log.Info("Watching for new instances", "path", notifyPath)
+
 	for {
-		// Check if notification file exists
-		info, err := os.Stat(notifyPath)
+		select {
+		case event, ok := <-watcher.Events:
+			if !ok {
+				return
+			}
 
-		if err == nil && info.ModTime().After(lastModTime) {
-			log.Info("New instance detected, bringing to front")
-			window.Show()
-			window.RequestFocus()
-			lastModTime = info.ModTime()
+			if event.Name == notifyPath && (event.Op&fsnotify.Write != 0 || event.Op&fsnotify.Create != 0) {
+				log.Printf("%+v", event)
+				log.Info("New instance detected, bringing to front")
+				window.Show()
+				window.RequestFocus()
+			}
+
+		case err, ok := <-watcher.Errors:
+			if !ok {
+				return
+			}
+			log.Error("Watcher error", "error", err)
 		}
-
-		time.Sleep(500 * time.Millisecond)
 	}
 }

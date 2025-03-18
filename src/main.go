@@ -55,9 +55,8 @@ func main() {
 		// Initialize lockfile
 		lock := initLock()
 		defer lock.Unlock()
+		go fsnotifyNewAppDetection()
 	}
-
-	go pollingNewAppDetection()
 
 	go dowloadMPV()
 
