@@ -34,7 +34,7 @@ func initLock() lockfile.Lockfile {
 	return lock
 }
 
-func fsnotifyNewAppDetection() {
+func newAppDetection() {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
 		log.Error("Error creating watcher", "error", err)

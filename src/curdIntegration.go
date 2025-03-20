@@ -3,6 +3,8 @@ package main
 import (
 	curd "AnimeGUI/curdInteg"
 	"AnimeGUI/src/anilist"
+	"AnimeGUI/src/config"
+	"AnimeGUI/src/richPresence"
 	"AnimeGUI/verniy"
 	"fmt"
 	"github.com/charmbracelet/log"
@@ -207,6 +209,7 @@ func playingAnimeLoop(playingAnime curd.Anime, animeData *verniy.MediaList, savi
 	fmt.Println(playingAnime.Ep.Player.PlaybackTime, "ah oue")
 	// Get video duration
 	go func() {
+		defer richPresence.SetMenuActivity()
 		for {
 			time.Sleep(1 * time.Second)
 			if playingAnime.Ep.Duration == 0 {
@@ -231,6 +234,7 @@ func playingAnimeLoop(playingAnime curd.Anime, animeData *verniy.MediaList, savi
 						} else {
 							log.Error("Error seeking video: playback time is", playingAnime.Ep.Player.PlaybackTime)
 						}
+						//richPresence.ResetTime()
 						break
 					} else {
 						log.Error("Error: duration is not a float64")
@@ -239,6 +243,7 @@ func playingAnimeLoop(playingAnime curd.Anime, animeData *verniy.MediaList, savi
 			}
 		}
 
+		presenceAnime := richPresence.PresenceAnime{Name: playingAnime.Title.English, Ep: playingAnime.Ep.Number, ImageLink: *animeData.Media.CoverImage.Large, PlaybackTime: 0, Duration: playingAnime.Ep.Duration, TotalEp: playingAnime.TotalEpisodes}
 		for {
 			time.Sleep(1 * time.Second)
 			timePos, err := curd.MPVSendCommand(playingAnime.Ep.Player.SocketPath, []interface{}{"get_property", "time-pos"})
@@ -270,6 +275,10 @@ func playingAnimeLoop(playingAnime curd.Anime, animeData *verniy.MediaList, savi
 				if timing, ok := timePos.(float64); ok {
 					playingAnime.Ep.Player.PlaybackTime = int(timing + 0.5)
 					log.Infof("Video position: %d seconds", playingAnime.Ep.Player.PlaybackTime)
+					if config.Setting.DiscordPresence {
+						presenceAnime.PlaybackTime = playingAnime.Ep.Player.PlaybackTime
+						richPresence.SetAnimeActivity(&presenceAnime)
+					}
 				} else {
 					log.Error("Error: time-pos is not a float64")
 				}
@@ -278,7 +287,6 @@ func playingAnimeLoop(playingAnime curd.Anime, animeData *verniy.MediaList, savi
 
 		}
 	}()
-
 }
 
 func UpdateProgressHandler(anime curd.Anime) {

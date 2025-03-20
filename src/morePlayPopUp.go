@@ -41,5 +41,5 @@ func openPlayMorePopUp() {
 	//sizeW := window.Canvas().Size()
 	//sizePopup := playMorePopUp.Size()
 	//playMorePopUp.ShowAtPosition(fyne.Position{sizeW.Width - sizePopup.Width - 50, sizeW.Height - sizePopup.Height - 50})
-	playMorePopUp.ShowAtRelativePosition(fyne.Position{X: 0, Y: -110}, playButton)
+	playMorePopUp.ShowAtRelativePosition(fyne.Position{X: 0, Y: -110}, moreActionButton)
 }

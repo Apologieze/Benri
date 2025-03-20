@@ -2,18 +2,41 @@ package richPresence
 
 import (
 	"AnimeGUI/src/config"
+	"fmt"
 	"github.com/charmbracelet/log"
 	"github.com/hugolgst/rich-go/client"
 	"time"
 )
 
+type PresenceAnime struct {
+	Name         string
+	Ep           int
+	TotalEp      int
+	ImageLink    string
+	PlaybackTime int
+	Duration     int
+}
+
+type PresenceState int
+
+const (
+	MainMenu PresenceState = iota
+	Watching
+)
+
+const advert = "Free, open-source, crossplatform Anime streaming app :D"
+
 var timeNow = time.Now()
 
-func ResetTime() {
-	timeNow = time.Now()
+func ResetTime(waitingTime int) {
+	go func() {
+		time.Sleep(time.Duration(waitingTime) * time.Second)
+		timeNow = time.Now()
+	}()
 }
 func InitDiscordRichPresence() {
 	if !config.Setting.DiscordPresence {
+		client.Logout()
 		return
 	}
 	err := client.Login("1046397185467621418")
@@ -26,11 +49,12 @@ func InitDiscordRichPresence() {
 }
 
 func SetMenuActivity() {
+	log.Info("Main Menu Activity presence")
 	err := client.SetActivity(client.Activity{
 		Details:    "In Main Menu",
-		State:      "Free, open-source, crossplatform Anime streaming app :D",
+		State:      advert,
 		LargeImage: "https://apologize.fr/benri/icon.jpg",
-		LargeText:  "Free, open-source, crossplatform Anime streaming app :D",
+		LargeText:  advert,
 		/*SmallImage: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx170942-B77wUSM1jQTu.jpg",
 		SmallText:  "And this is the small image",*/
 		/*Party: &client.Party{
@@ -59,14 +83,20 @@ func SetMenuActivity() {
 	}
 }
 
-func SetActivity() {
+func SetAnimeActivity(anime *PresenceAnime) {
+	//zeroTime := time.Now()
+	if anime == nil {
+		SetMenuActivity()
+		return
+	}
+
 	err := client.SetActivity(client.Activity{
-		State:      "Episode 12/24 - 12min 3s",
-		Details:    "Blue Box",
-		LargeImage: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx170942-B77wUSM1jQTu.jpg",
-		LargeText:  "This is the large image :D",
-		/*SmallImage: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx170942-B77wUSM1jQTu.jpg",
-		SmallText:  "And this is the small image",*/
+		State:      fmt.Sprintf("%s remaining", numberToTime(anime.Duration-anime.PlaybackTime)),
+		Details:    fmt.Sprintf("%s Episode %d/%d", anime.Name, anime.Ep, anime.TotalEp),
+		LargeImage: anime.ImageLink,
+		LargeText:  anime.Name,
+		SmallImage: "https://apologize.fr/benri/icon.jpg",
+		SmallText:  advert,
 		/*Party: &client.Party{
 			ID:         "-1",
 			Players:    15,
@@ -91,4 +121,10 @@ func SetActivity() {
 	if err != nil {
 		log.Error(err)
 	}
+}
+
+func numberToTime(seconds int) string {
+	minutes := seconds / 60
+	seconds %= 60
+	return fmt.Sprintf("%dmin %ds", minutes, seconds)
 }

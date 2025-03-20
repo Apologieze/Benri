@@ -2,6 +2,7 @@ package main
 
 import (
 	"AnimeGUI/src/config"
+	"AnimeGUI/src/richPresence"
 	"fmt"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
@@ -20,7 +21,10 @@ func initSettingDialog() {
 		config.SetBool(config.TrayIconKey, b)
 		fmt.Println(config.Setting.TrayIcon)
 	})
-	checkDiscordPresence := widget.NewCheck("", func(b bool) { config.SetBool(config.DiscordPresence, b) })
+	checkDiscordPresence := widget.NewCheck("", func(b bool) {
+		config.SetBool(config.DiscordPresence, b)
+		richPresence.InitDiscordRichPresence()
+	})
 
 	checkSkipOpening.SetChecked(config.Setting.SkipOpening)
 	checkSkipEnding.SetChecked(config.Setting.SkipEnding)

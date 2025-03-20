@@ -41,6 +41,7 @@ var (
 	episodeNumber       = widget.NewLabelWithStyle("", fyne.TextAlignCenter, fyne.TextStyle{Bold: true})
 	episodeLastPlayback = widget.NewLabelWithStyle("", fyne.TextAlignCenter, fyne.TextStyle{})
 	playButton          *widget.Button
+	moreActionButton    *widget.Button
 	changedToken        bool
 	mpvPresent          bool
 	grayScaleList       uint8 = 35
@@ -56,7 +57,7 @@ func main() {
 		// Initialize lockfile
 		lock := initLock()
 		defer lock.Unlock()
-		go fsnotifyNewAppDetection()
+		go newAppDetection()
 	}
 
 	go dowloadMPV()
@@ -306,7 +307,7 @@ func initMainApp() {
 	playButton.IconPlacement = widget.ButtonIconTrailingText
 	playButton.Importance = widget.HighImportance
 
-	moreActionButton := widget.NewButtonWithIcon("", theme.MoreHorizontalIcon(), func() {
+	moreActionButton = widget.NewButtonWithIcon("", theme.MoreHorizontalIcon(), func() {
 		openPlayMorePopUp()
 	})
 	playContainer := container.NewPadded(container.NewBorder(nil, nil, layout.NewSpacer(), moreActionButton, playButton))
