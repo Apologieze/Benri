@@ -6,6 +6,7 @@ import (
 	"AnimeGUI/src/config"
 	"AnimeGUI/src/richPresence"
 	"AnimeGUI/verniy"
+	"errors"
 	"fmt"
 	"github.com/charmbracelet/log"
 	"os"
@@ -97,14 +98,15 @@ type AllAnimeIdData struct {
 	Name string
 }
 
-func OnPlayButtonClick(animeName string, animeData *verniy.MediaList, savingWatch bool) {
+func OnPlayButtonClick(animeName string, animeData *verniy.MediaList, savingWatch bool) error {
+
 	if mpvPresent == false {
 		log.Error("MPV is not yet dl")
-		return
+		return errors.New("please wait for MPV to finish downloading")
 	}
 	if animeData == nil {
 		log.Error("Anime data is nil")
-		return
+		return errors.New("no selected anime")
 	}
 	var allAnimeId string
 	animeProgress := 0
@@ -116,12 +118,12 @@ func OnPlayButtonClick(animeName string, animeData *verniy.MediaList, savingWatc
 		allAnimeId = searchAllAnimeData(anilist.AnimeToRomaji(animeData.Media), animeData.Media.Episodes, animeProgress)
 		if allAnimeId == "" {
 			log.Error("Failed to get allAnimeId")
-			return
+			return errors.New("failed to link anime")
 		}
 		err, _ := curd.LocalUpdateAnime(databaseFile, animeData.Media.ID, allAnimeId, animeProgress, 0, 0, animeName)
 		if err != nil {
 			log.Error("Can't update database file", err)
-			return
+			return errors.New("can't update database file")
 		} else {
 			log.Info("Successfully updated database file")
 		}
@@ -142,20 +144,20 @@ func OnPlayButtonClick(animeName string, animeData *verniy.MediaList, savingWatc
 	url, err := curd.GetEpisodeURL(userCurdConfig, allAnimeId, animeProgress)
 	if err != nil {
 		log.Error(err)
-		return
+		return err
 	}
 	fmt.Println("--Got all urls")
 	finalLink := curd.PrioritizeLink(url)
 	if len(finalLink) < 5 {
 		log.Error("No valid link found")
-		return
+		return errors.New("couldn't find episode")
 	}
 	fmt.Println("Final Link:", finalLink)
 
 	mpvSocketPath, err := curd.StartVideo(finalLink, []string{}, fmt.Sprintf("%s - Episode %d", animeName, animeProgress))
 	if err != nil {
 		log.Error(err)
-		return
+		return err
 	}
 	fmt.Println("MPV Socket Path:", mpvSocketPath)
 	playingAnime := curd.Anime{AnilistId: animeData.Media.ID, AllanimeId: allAnimeId}
@@ -170,6 +172,7 @@ func OnPlayButtonClick(animeName string, animeData *verniy.MediaList, savingWatc
 		}
 	}
 	playingAnimeLoop(playingAnime, animeData, savingWatch)
+	return nil
 }
 
 func searchAllAnimeData(animeName string, epNumber *int, animeProgress int) string {
@@ -244,6 +247,7 @@ func playingAnimeLoop(playingAnime curd.Anime, animeData *verniy.MediaList, savi
 		}
 
 		presenceAnime := richPresence.PresenceAnime{Name: playingAnime.Title.English, Ep: playingAnime.Ep.Number + 1, ImageLink: *animeData.Media.CoverImage.Large, PlaybackTime: 0, Duration: playingAnime.Ep.Duration, TotalEp: playingAnime.TotalEpisodes}
+		var pauseCounter int
 		for {
 			time.Sleep(1 * time.Second)
 			timePos, err := curd.MPVSendCommand(playingAnime.Ep.Player.SocketPath, []interface{}{"get_property", "time-pos"})
@@ -273,8 +277,20 @@ func playingAnimeLoop(playingAnime curd.Anime, animeData *verniy.MediaList, savi
 			}
 			if timePos != nil && playingAnime.Ep.Duration != 0 {
 				if timing, ok := timePos.(float64); ok {
-					playingAnime.Ep.Player.PlaybackTime = int(timing + 0.5)
-					log.Infof("Video position: %d seconds", playingAnime.Ep.Player.PlaybackTime)
+					tempTime := int(timing + 0.5)
+					if tempTime == playingAnime.Ep.Player.PlaybackTime {
+						pauseCounter++
+					} else {
+						pauseCounter = 0
+						presenceAnime.Paused = false
+						richPresence.ResetTime(playingAnime.Ep.Player.PlaybackTime, playingAnime.Ep.Duration)
+					}
+					if pauseCounter == 2 {
+						log.Info("pause")
+						presenceAnime.Paused = true
+					}
+					playingAnime.Ep.Player.PlaybackTime = tempTime
+					log.Infof("Video position: %d seconds", tempTime)
 					if config.Setting.DiscordPresence {
 						presenceAnime.PlaybackTime = playingAnime.Ep.Player.PlaybackTime
 						richPresence.SetAnimeActivity(&presenceAnime)

@@ -3,9 +3,10 @@
 | Status         | Priority  | Task                                                                          |
 |----------------|-----------|-------------------------------------------------------------------------------|
 | 📝 To do       | 🟡 Medium | Make skipping option actually work                                            |
-| 📝 To do       | 🟡 Medium | Custom discord presence                                                       |
 | 📝 To do       | 🟢 Low    | Some anime like "Monster" can only get linked by searching for "Monster 2008" |
+| 📝 To do       | 🟢 Low    | Add other sources for different languages                                     |
 | 🚧 In Progress | 🟡 Medium |                                                                               |
+| ✅ Done         | 🟡 Medium | Custom discord presence                                                       |
 | ✅ Done         | 🔴 High   | Fix "Last saved" message bug on first selected anime                          |
 | ✅ Done         | 🔴 High   | Opening a new app check if already running instance                           |
 | ✅ Done         | 🔴 High   | Add option to watch untracked last previous episode                           |
@@ -14,6 +15,6 @@
 
 ### Small todo
 
-- [ ] Watching last episode should refresh data
+- [x] Watching last episode should refresh data
 
 - [ ] Having an indicator if new ep is out

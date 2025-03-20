@@ -15,6 +15,7 @@ type PresenceAnime struct {
 	ImageLink    string
 	PlaybackTime int
 	Duration     int
+	Paused       bool
 }
 
 type PresenceState int
@@ -26,13 +27,14 @@ const (
 
 const advert = "Free, open-source, crossplatform Anime streaming app :D"
 
-var timeNow = time.Now()
+var timeStartApp = time.Now()
 
-func ResetTime(waitingTime int) {
-	go func() {
-		time.Sleep(time.Duration(waitingTime) * time.Second)
-		timeNow = time.Now()
-	}()
+var timeBegin = timeStartApp
+var timeEnd = timeBegin.Add(time.Minute * 30)
+
+func ResetTime(PlaybackTime, Duration int) {
+	timeBegin = time.Now().Add(-time.Second * time.Duration(PlaybackTime))
+	timeEnd = timeBegin.Add(time.Second * time.Duration(Duration))
 }
 func InitDiscordRichPresence() {
 	if !config.Setting.DiscordPresence {
@@ -74,7 +76,7 @@ func SetMenuActivity() {
 			},*/
 		},
 		Timestamps: &client.Timestamps{
-			Start: &timeNow,
+			Start: &timeStartApp,
 			//End:   &then,
 		},
 	})
@@ -90,11 +92,19 @@ func SetAnimeActivity(anime *PresenceAnime) {
 		SetMenuActivity()
 		return
 	}
+	var timeStamps *client.Timestamps = nil
+
+	if !anime.Paused {
+		timeStamps = &client.Timestamps{
+			Start: &timeBegin,
+			End:   &timeEnd,
+		}
+	}
 
 	err := client.SetActivity(client.Activity{
 		Type:       client.ActivityTypeWatching,
-		State:      fmt.Sprintf("%s remaining", numberToTime(anime.Duration-anime.PlaybackTime)),
-		Details:    fmt.Sprintf("%s Episode %d/%d", anime.Name, anime.Ep, anime.TotalEp),
+		State:      fmt.Sprintf("Episode %d/%d %s", anime.Ep, anime.TotalEp, pausedToString(anime.Paused)),
+		Details:    fmt.Sprintf("%s", anime.Name),
 		LargeImage: anime.ImageLink,
 		LargeText:  anime.Name,
 		SmallImage: "main-image",
@@ -114,15 +124,19 @@ func SetAnimeActivity(anime *PresenceAnime) {
 				Url:   "https://uwu.apologize.fr/preview",
 			},*/
 		},
-		Timestamps: &client.Timestamps{
-			Start: &timeNow,
-			//End:   &then,
-		},
+		Timestamps: timeStamps,
 	})
 
 	if err != nil {
 		log.Error(err)
 	}
+}
+
+func pausedToString(paused bool) string {
+	if paused {
+		return "PAUSED"
+	}
+	return ""
 }
 
 func numberToTime(seconds int) string {

@@ -166,7 +166,10 @@ func selectCorrectLinking(allAnimeList []AllAnimeIdData, animeName string, anime
 		if tempAnime != nil {
 			localAnime = tempAnime
 		}
-		OnPlayButtonClick(animeName, animeSelected, true)
+		err = OnPlayButtonClick(animeName, animeSelected, true)
+		if err != nil {
+			showErrorPopUp(err)
+		}
 	}
 
 	dialogC.Resize(fyne.NewSize(600, 900))
@@ -301,7 +304,10 @@ func initMainApp() {
 		if animeName.Text == "" {
 			return
 		}
-		OnPlayButtonClick(animeName.Text, animeSelected, true)
+		err := OnPlayButtonClick(animeName.Text, animeSelected, true)
+		if err != nil {
+			showErrorPopUp(err)
+		}
 	})
 
 	playButton.IconPlacement = widget.ButtonIconTrailingText

@@ -21,7 +21,10 @@ func initPlayMorePopUp() {
 			return
 		}
 		playMorePopUp.Hide()
-		OnPlayButtonClick(animeName.Text, animeSelected, false)
+		err := OnPlayButtonClick(animeName.Text, animeSelected, false)
+		if err != nil {
+			showErrorPopUp(err)
+		}
 	})
 	playPreviousButton.IconPlacement = widget.ButtonIconTrailingText
 
