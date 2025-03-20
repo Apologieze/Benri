@@ -243,7 +243,7 @@ func playingAnimeLoop(playingAnime curd.Anime, animeData *verniy.MediaList, savi
 			}
 		}
 
-		presenceAnime := richPresence.PresenceAnime{Name: playingAnime.Title.English, Ep: playingAnime.Ep.Number, ImageLink: *animeData.Media.CoverImage.Large, PlaybackTime: 0, Duration: playingAnime.Ep.Duration, TotalEp: playingAnime.TotalEpisodes}
+		presenceAnime := richPresence.PresenceAnime{Name: playingAnime.Title.English, Ep: playingAnime.Ep.Number + 1, ImageLink: *animeData.Media.CoverImage.Large, PlaybackTime: 0, Duration: playingAnime.Ep.Duration, TotalEp: playingAnime.TotalEpisodes}
 		for {
 			time.Sleep(1 * time.Second)
 			timePos, err := curd.MPVSendCommand(playingAnime.Ep.Player.SocketPath, []interface{}{"get_property", "time-pos"})

@@ -6,6 +6,11 @@
 </div>
 <br>
 
+## Features
+- Complete Anilist integration to save your progression and browse anime
+- Discord Rich Presence
+- Resume where you left off in the episode
+
 ## Download
 - If you're on Windows, you can download the latest executable [here](https://uwu.apologize.fr/download) <br>
 
