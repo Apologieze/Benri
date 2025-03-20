@@ -5,6 +5,7 @@ import (
 	"AnimeGUI/src/anilist"
 	"AnimeGUI/src/config"
 	"AnimeGUI/src/richPresence"
+	"AnimeGUI/src/ui"
 	"AnimeGUI/verniy"
 	"errors"
 	"fmt"
@@ -99,6 +100,13 @@ type AllAnimeIdData struct {
 }
 
 func OnPlayButtonClick(animeName string, animeData *verniy.MediaList, savingWatch bool) error {
+	succes := false
+	ui.ShowLoadingVideoPopUp()
+	defer func() {
+		if !succes {
+			ui.CloseLoadingPopup(0)
+		}
+	}()
 
 	if mpvPresent == false {
 		log.Error("MPV is not yet dl")
@@ -172,6 +180,8 @@ func OnPlayButtonClick(animeName string, animeData *verniy.MediaList, savingWatc
 		}
 	}
 	playingAnimeLoop(playingAnime, animeData, savingWatch)
+	ui.ChangeLoadingStep(2)
+	succes = true
 	return nil
 }
 
@@ -246,6 +256,7 @@ func playingAnimeLoop(playingAnime curd.Anime, animeData *verniy.MediaList, savi
 			}
 		}
 
+		ui.CloseLoadingPopup(1)
 		presenceAnime := richPresence.PresenceAnime{Name: playingAnime.Title.English, Ep: playingAnime.Ep.Number + 1, ImageLink: *animeData.Media.CoverImage.Large, PlaybackTime: 0, Duration: playingAnime.Ep.Duration, TotalEp: playingAnime.TotalEpisodes}
 		var pauseCounter int
 		for {

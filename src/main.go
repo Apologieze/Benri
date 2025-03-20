@@ -5,6 +5,7 @@ import (
 	"AnimeGUI/src/anilist"
 	"AnimeGUI/src/config"
 	"AnimeGUI/src/richPresence"
+	"AnimeGUI/src/ui"
 	"AnimeGUI/verniy"
 	"fmt"
 	"fyne.io/fyne/v2"
@@ -357,6 +358,7 @@ func initMainApp() {
 
 	initSettingDialog()
 	initPlayMorePopUp()
+	ui.InitLoadingVideoPopUp(window)
 
 	window.SetContent(fynetooltip.AddWindowToolTipLayer(container.NewBorder(nil, nil, nil, imageContainer, leftSide), window.Canvas()))
 	window.Canvas().Focus(input)
