@@ -1,10 +1,10 @@
 package richPresence
 
 import (
+	"AnimeGUI/richgo/client"
 	"AnimeGUI/src/config"
 	"fmt"
 	"github.com/charmbracelet/log"
-	"github.com/hugolgst/rich-go/client"
 	"time"
 )
 
@@ -51,9 +51,10 @@ func InitDiscordRichPresence() {
 func SetMenuActivity() {
 	log.Info("Main Menu Activity presence")
 	err := client.SetActivity(client.Activity{
+		Type:       client.ActivityTypeWatching,
 		Details:    "In Main Menu",
 		State:      advert,
-		LargeImage: "https://apologize.fr/benri/icon.jpg",
+		LargeImage: "main-image",
 		LargeText:  advert,
 		/*SmallImage: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx170942-B77wUSM1jQTu.jpg",
 		SmallText:  "And this is the small image",*/
@@ -91,11 +92,12 @@ func SetAnimeActivity(anime *PresenceAnime) {
 	}
 
 	err := client.SetActivity(client.Activity{
+		Type:       client.ActivityTypeWatching,
 		State:      fmt.Sprintf("%s remaining", numberToTime(anime.Duration-anime.PlaybackTime)),
 		Details:    fmt.Sprintf("%s Episode %d/%d", anime.Name, anime.Ep, anime.TotalEp),
 		LargeImage: anime.ImageLink,
 		LargeText:  anime.Name,
-		SmallImage: "https://apologize.fr/benri/icon.jpg",
+		SmallImage: "main-image",
 		SmallText:  advert,
 		/*Party: &client.Party{
 			ID:         "-1",

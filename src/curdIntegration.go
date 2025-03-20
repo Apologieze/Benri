@@ -320,7 +320,7 @@ func displayLocalProgress() {
 	playButton.Text = fmt.Sprint("Play Ep", currentEp)
 	fmt.Println("Current Ep:", currentEp)
 
-	setPlayButtonVisibility()
+	defer setPlayButtonVisibility()
 	if localDbAnime != nil {
 		if localDbAnime.Ep.Number == AnimeProgress {
 			if localDbAnime.Ep.Player.PlaybackTime == 0 {
@@ -339,6 +339,7 @@ func displayLocalProgress() {
 }
 
 func setPlayButtonVisibility() {
+	defer playButton.Refresh()
 	if animeSelected.Media.NextAiringEpisode != nil {
 		if *animeSelected.Progress+1 == animeSelected.Media.NextAiringEpisode.Episode {
 			playButton.Hide()
