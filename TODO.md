@@ -2,6 +2,7 @@
 
 | Status         | Priority  | Task                                                                          |
 |----------------|-----------|-------------------------------------------------------------------------------|
+| 📝 To do       | 🟡 Medium | Give anime a score when you complete them                                     |
 | 📝 To do       | 🟡 Medium | Make skipping option actually work                                            |
 | 📝 To do       | 🟢 Low    | Some anime like "Monster" can only get linked by searching for "Monster 2008" |
 | 📝 To do       | 🟢 Low    | Add other sources for different languages                                     |
