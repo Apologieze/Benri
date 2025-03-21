@@ -3,7 +3,6 @@ package ui
 import (
 	"fmt"
 	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/widget"
 	"github.com/charmbracelet/log"
@@ -12,19 +11,24 @@ import (
 
 var loadingVideoPopup *dialog.CustomDialog
 var step int
+var mainWindow fyne.Window
 
 func InitLoadingVideoPopUp(window fyne.Window) {
-	content := container.NewVBox(widget.NewLabel("Loading episode"))
-	loadingVideoPopup = dialog.NewCustomWithoutButtons("Loading episode", content, window)
-	loadingVideoPopup.Resize(fyne.NewSize(400, 400))
-
+	//content := container.NewVBox(widget.NewLabel("Loading episode"))
+	/*content := widget.NewProgressBarInfinite()
+	loadingVideoPopup = dialog.NewCustomWithoutButtons("Loading Episode", content, window)
+	loadingVideoPopup.Resize(fyne.NewSize(400, 50))*/
+	mainWindow = window
 }
 
 func ChangeLoadingStep(value int) {
 	step = value
 }
 
-func ShowLoadingVideoPopUp() {
+func ShowLoadingVideoPopUp(title string) {
+	content := widget.NewProgressBarInfinite()
+	loadingVideoPopup = dialog.NewCustomWithoutButtons(fmt.Sprint("Loading ", title), content, mainWindow)
+	loadingVideoPopup.Resize(fyne.NewSize(400, 50))
 	step = 1
 	if loadingVideoPopup == nil {
 		log.Error("Couldn't open loading popup")

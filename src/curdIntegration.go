@@ -101,7 +101,7 @@ type AllAnimeIdData struct {
 
 func OnPlayButtonClick(animeName string, animeData *verniy.MediaList, savingWatch bool) error {
 	succes := false
-	ui.ShowLoadingVideoPopUp()
+
 	defer func() {
 		if !succes {
 			ui.CloseLoadingPopup(0)
@@ -126,7 +126,7 @@ func OnPlayButtonClick(animeName string, animeData *verniy.MediaList, savingWatc
 		allAnimeId = searchAllAnimeData(anilist.AnimeToRomaji(animeData.Media), animeData.Media.Episodes, animeProgress)
 		if allAnimeId == "" {
 			log.Error("Failed to get allAnimeId")
-			return errors.New("failed to link anime")
+			return nil
 		}
 		err, _ := curd.LocalUpdateAnime(databaseFile, animeData.Media.ID, allAnimeId, animeProgress, 0, 0, animeName)
 		if err != nil {
@@ -147,6 +147,8 @@ func OnPlayButtonClick(animeName string, animeData *verniy.MediaList, savingWatc
 	}
 
 	log.Info("Anime Progress:", animeProgress)
+
+	ui.ShowLoadingVideoPopUp(fmt.Sprint(animeName, " | Episode ", animeProgress))
 
 	fmt.Println("Start getting url")
 	url, err := curd.GetEpisodeURL(userCurdConfig, allAnimeId, animeProgress)
