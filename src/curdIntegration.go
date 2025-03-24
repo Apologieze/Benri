@@ -350,7 +350,17 @@ func displayLocalProgress() {
 	fmt.Println("Current Ep:", currentEp)
 
 	defer setPlayButtonVisibility()
+
+	if animeSelected.Score != nil && (*animeSelected.Status != verniy.MediaListStatusCurrent) {
+		if *animeSelected.Score != 0 {
+			episodeLastPlayback.SetText(fmt.Sprint("Your score: ", *animeSelected.Score, "/10"))
+			episodeLastPlayback.Show()
+			return
+		}
+	}
+
 	if localDbAnime != nil {
+
 		if localDbAnime.Ep.Number == AnimeProgress {
 			if localDbAnime.Ep.Player.PlaybackTime == 0 {
 				episodeLastPlayback.SetText(fmt.Sprintf("Just finished Episode %d", localDbAnime.Ep.Number))
@@ -364,6 +374,7 @@ func displayLocalProgress() {
 			}
 		}
 	}
+	//log.Info("No local data found")
 	episodeLastPlayback.Hide()
 }
 

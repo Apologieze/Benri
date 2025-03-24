@@ -52,7 +52,7 @@ var (
 
 func main() {
 	appW = app.NewWithID(AppID)
-
+	appW.Settings()
 	config.CreateConfig(appW.Preferences())
 	if config.Setting.TrayIcon {
 		// Initialize lockfile

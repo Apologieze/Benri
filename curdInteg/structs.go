@@ -53,10 +53,11 @@ type playingVideo struct {
 }
 
 type User struct {
-	Token     string
-	Username  string
-	Id        int
-	AnimeList AnimeList
+	Token       string
+	Username    string
+	ScoreFormat string
+	Id          int
+	AnimeList   AnimeList
 }
 
 // AniListAnime is the struct for the API response

@@ -15,7 +15,7 @@ var fields = []verniy.MediaListGroupField{
 		verniy.MediaListFieldID,
 		verniy.MediaListFieldMediaID,
 		verniy.MediaListFieldStatus,
-		verniy.MediaListFieldScore,
+		verniy.MediaListFieldCustomScore,
 		verniy.MediaListFieldProgress,
 		verniy.MediaListFieldMedia(
 			verniy.MediaFieldID,

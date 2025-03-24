@@ -1543,6 +1543,7 @@ const (
 	MediaListFieldMediaID               MediaListField = "mediaId"
 	MediaListFieldStatus                MediaListField = "status"
 	MediaListFieldScore                 MediaListField = "score" // TODO: with param
+	MediaListFieldCustomScore           MediaListField = "score(format: POINT_10_DECIMAL)"
 	MediaListFieldProgress              MediaListField = "progress"
 	MediaListFieldProgressVolumes       MediaListField = "progressVolumes"
 	MediaListFieldRepeat                MediaListField = "repeat"

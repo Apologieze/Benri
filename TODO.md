@@ -19,3 +19,4 @@
 - [x] Watching last episode should refresh data
 
 - [ ] Having an indicator if new ep is out
+- [ ] Show anime score on completed
