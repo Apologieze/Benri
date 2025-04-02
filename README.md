@@ -15,7 +15,7 @@
 - If you're on Windows, you can download the latest executable [here](https://uwu.apologize.fr/download) <br>
 
 ## Compile
-- For now you can just build the project with `go build .`
+- For now you can just build the project with `go build ./src/`
 - Binaries for each OS will come when the project release stable version<br>
 
 ---
