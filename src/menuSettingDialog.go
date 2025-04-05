@@ -9,6 +9,7 @@ import (
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/driver/desktop"
 	"fyne.io/fyne/v2/layout"
+	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 )
 
@@ -39,9 +40,21 @@ func initSettingDialog() {
 		widget.NewLabelWithStyle("Show Discord Activity", fyne.TextAlignLeading, fyne.TextStyle{Bold: true}), checkDiscordPresence,
 	)
 	//form := container.New(layout.NewFormLayout(), rowSkipOpening)
-	menuOption := container.NewBorder(nil, nil, nil, nil, rowSkipOpening)
-	dialogMenuOption = dialog.NewCustom("Settings", "Close Settings", menuOption, window)
-	dialogMenuOption.Resize(fyne.NewSize(200, 300))
+	logoutButton := widget.NewButtonWithIcon("Log out AniList", theme.AccountIcon(), func() {
+		deleteTokenFile()
+		appW.Quit()
+	})
+
+	logoutButton.Importance = widget.WarningImportance
+	logoutContainer := container.NewPadded(container.NewHBox(&layout.Spacer{}, logoutButton, &layout.Spacer{}))
+
+	menuBox := container.NewVBox(rowSkipOpening, logoutContainer)
+	menuOption := container.NewBorder(nil, nil, nil, nil, menuBox)
+	dialogMenuOption = dialog.NewCustomWithoutButtons("Settings", menuOption, window)
+
+	closeButton := widget.NewButtonWithIcon("Close Settings", theme.CancelIcon(), func() { dialogMenuOption.Hide() })
+	dialogMenuOption.SetButtons([]fyne.CanvasObject{closeButton})
+	dialogMenuOption.Resize(fyne.NewSize(200, 400))
 }
 
 func openMenuOption() {

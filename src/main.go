@@ -204,12 +204,9 @@ func initMainApp() {
 	)
 
 	listDisplay := widget.NewListWithData(data,
-		func() fyne.CanvasObject {
-			return &widget.Label{Text: "template"}
-		},
-		func(i binding.DataItem, o fyne.CanvasObject) {
-			o.(*widget.Label).Bind(i.(binding.String))
-		})
+		func() fyne.CanvasObject { return &widget.Label{Text: "template"} },
+		func(i binding.DataItem, o fyne.CanvasObject) { o.(*widget.Label).Bind(i.(binding.String)) },
+	)
 
 	input := widget.NewEntry()
 	input.SetPlaceHolder("Filter anime name")
