@@ -29,6 +29,8 @@
  </picture>
 </a>
 
+[Website](https://apologize.fr/benri) - [Repo](https://github.com/Apologieze/benri.web)
+
 ## Credits
 - [curd](https://github.com/Wraient/curd) - For the inspiration and for the video fetching and streaming code
 - [fyne](https://github.com/fyne-io/fyne) - For cross-platform GUI
