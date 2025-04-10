@@ -25,7 +25,7 @@ func CreateConfig(app fyne.Preferences) {
 		preference:      app,
 		SkipOpening:     app.Bool(SkipOpeningKey),
 		SkipEnding:      app.Bool(SkipEndingKey),
-		TrayIcon:        app.Bool(TrayIconKey),
+		TrayIcon:        app.BoolWithFallback(TrayIconKey, true),
 		DiscordPresence: app.BoolWithFallback(DiscordPresence, true),
 	}
 }

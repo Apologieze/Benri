@@ -40,7 +40,7 @@ func initSettingDialog() {
 		widget.NewLabelWithStyle("Show Discord Activity", fyne.TextAlignLeading, fyne.TextStyle{Bold: true}), checkDiscordPresence,
 	)
 	//form := container.New(layout.NewFormLayout(), rowSkipOpening)
-	logoutButton := widget.NewButtonWithIcon("Log out AniList", theme.AccountIcon(), func() {
+	logoutButton := widget.NewButtonWithIcon("Log out from AniList", theme.AccountIcon(), func() {
 		deleteTokenFile()
 		appW.Quit()
 	})
